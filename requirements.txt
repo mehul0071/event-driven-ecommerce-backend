@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic
+pytest
+httpx
+sqlalchemy
+psycopg2-binary
+python-dotenv
