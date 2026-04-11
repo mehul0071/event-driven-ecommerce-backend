@@ -1,7 +1,10 @@
+from multiprocessing import context
 from dotenv import load_dotenv
 import os
-load_dotenv()
+from app.core.database import Base
 from sqlalchemy import create_engine, pool
+
+load_dotenv()
 
 def run_migrations_online() -> None:
     sync_db_url = os.getenv("SYNC_DATABASE_URL")
@@ -13,7 +16,7 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata
+            target_metadata = Base.metadata
         )
 
         with context.begin_transaction():
