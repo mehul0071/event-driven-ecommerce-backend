@@ -6,7 +6,7 @@ from app.core.database import get_db
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("/place-order")
 def place_order(
     order: OrderCreate,
     background_tasks: BackgroundTasks,

@@ -5,8 +5,9 @@ from app.core.database import engine, Base
 app = FastAPI(title="Event-Driven E-Commerce")
 
 @app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
+async def on_startup():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 app.include_router(api_router, prefix="/api/v1")
 

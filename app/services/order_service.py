@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 from time import sleep
-from app.models.order import Order
+from app.models.order import OrderModel
 from app.schemas.order import OrderCreate
 from app.events.order_events import OrderCreatedEvent
 
@@ -18,7 +18,7 @@ def handle_notification(event: OrderCreatedEvent):
     print(f"[Notification] Sending confirmation for order {event.order_id}")
 
 def create_order(db: Session, order: OrderCreate, background_tasks):
-    new_order = Order(status="created")
+    new_order = OrderModel(status="created")
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
