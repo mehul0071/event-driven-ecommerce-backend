@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 
 class ProductCreate(BaseModel):
@@ -5,4 +6,4 @@ class ProductCreate(BaseModel):
     price: float
 
 class ProductResponse(ProductCreate):
-    id: int
+    id: UUID

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api.v1.api import api_router
 from app.core.database import engine, Base
+from app.models import order, product
 
 app = FastAPI(title="Event-Driven E-Commerce")
 

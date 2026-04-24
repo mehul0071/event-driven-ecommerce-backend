@@ -1,17 +1,15 @@
-from sqlalchemy import Column, Integer, String, Float, func
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base
 from uuid import uuid4
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy.dialects.postgresql import UUID
+from app.core.database import Base
 
 class ProductModel(Base):
     __tablename__ = "products"
 
     id = Column(
-        UUID(as_uuid=True), 
-        primary_key=True, 
-        server_default=func.uuid_generate_v4(),
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
         nullable=False
     )
     name = Column(String(255), nullable=False, index=True)

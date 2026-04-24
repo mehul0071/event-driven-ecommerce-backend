@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 from time import sleep
 from app.models.order import OrderModel
@@ -17,11 +17,11 @@ def handle_notification(event: OrderCreatedEvent):
     sleep(1)
     print(f"[Notification] Sending confirmation for order {event.order_id}")
 
-def create_order(db: Session, order: OrderCreate, background_tasks):
+async def create_order(db: AsyncSession, order: OrderCreate, background_tasks):
     new_order = OrderModel(status="created")
     db.add(new_order)
-    db.commit()
-    db.refresh(new_order)
+    await db.commit()
+    await db.refresh(new_order)
 
     event = OrderCreatedEvent(
         order_id=new_order.id,
