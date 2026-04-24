@@ -1,9 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base
-from uuid import uuid4
-
-Base = declarative_base()
+from app.core.database import Base
 
 class ProductModel(Base):
     __tablename__ = "products"

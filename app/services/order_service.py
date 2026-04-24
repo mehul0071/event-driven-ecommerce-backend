@@ -2,22 +2,22 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from time import sleep
 from app.models.order import OrderModel
-from app.schemas.order import OrderCreate
+from app.schemas.order import OrderCreate, OrderDetail
 from app.events.order_events import OrderCreatedEvent
 
-def handle_inventory(event: OrderCreatedEvent):
+async def handle_inventory(event: OrderCreatedEvent):
     sleep(2)
     print(f"[Inventory] Reserving stock for order {event.order_id}")
 
-def handle_payment(event: OrderCreatedEvent):
+async def handle_payment(event: OrderCreatedEvent):
     sleep(3)
     print(f"[Payment] Processing payment for order {event.order_id}")
 
-def handle_notification(event: OrderCreatedEvent):
+async def handle_notification(event: OrderCreatedEvent):
     sleep(1)
     print(f"[Notification] Sending confirmation for order {event.order_id}")
 
-def create_order(db: Session, order: OrderCreate, background_tasks):
+async def create_order(db: Session, order: OrderCreate, background_tasks):
     new_order = OrderModel(status="created")
     db.add(new_order)
     db.commit()
@@ -37,3 +37,6 @@ def create_order(db: Session, order: OrderCreate, background_tasks):
         "status": new_order.status,
         "items": order.items
     }
+
+# async def list_of_order_details(db: Session, Order: OrderDetail):
+#     stmt = 
