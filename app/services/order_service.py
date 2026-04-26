@@ -1,8 +1,11 @@
 import asyncio
 from datetime import datetime
 from typing import List
+from uuid import UUID
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.order import OrderModel, OrderDetailModel
 from app.models.product import ProductModel
 from app.schemas.order import OrderCreate, OrderDetail
@@ -36,9 +39,12 @@ async def create_order(db, order: OrderCreate, background_tasks):
         stmt = select(ProductModel).where(ProductModel.id == item.product_id)
         result = await db.execute(stmt)
         product = result.scalar_one_or_none()
-
+        
         if not product:
-            raise Exception("Product not found")
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found"
+            )
 
         subtotal = item.quantity * product.price
         total += subtotal
@@ -63,7 +69,7 @@ async def create_order(db, order: OrderCreate, background_tasks):
     }
 
 
-async def list_of_order_details(db) -> List[OrderDetail]:
+async def list_of_order_details(db: AsyncSession) -> List[OrderDetail]:
 
     stmt = select(OrderDetailModel, ProductModel).join(
         ProductModel,
@@ -84,6 +90,43 @@ async def list_of_order_details(db) -> List[OrderDetail]:
                 price=float(detail.unit_price),
                 quantity=detail.quantity,
                 total=float(detail.unit_price * detail.quantity)
+            )
+        )
+
+    return response
+
+        
+async def order_detail_by_id(
+    db: AsyncSession,
+    order_id: UUID
+) -> OrderDetail:
+
+    stmt = select(OrderDetailModel, ProductModel).join(
+        ProductModel,
+        OrderDetailModel.product_id == ProductModel.id
+    ).where(
+        OrderDetailModel.order_id == order_id
+    )
+    result = await db.execute(stmt)
+    order = result.all()
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail = "Order not found"
+        )
+
+    response = []
+
+    for orders, products in order:
+        response.append(
+            OrderDetail(
+                order_id=orders.order_id,
+                product_id=orders.product_id,
+                name=products.name,
+                price=float(orders.unit_price),
+                quantity=orders.quantity,
+                total=float(orders.unit_price * orders.quantity)
             )
         )
 

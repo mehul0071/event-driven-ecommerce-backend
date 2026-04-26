@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, pool
 
 from app.core.database import Base
-from app.models import order, product  # noqa: F401 - register models on Base.metadata
+from app.models import order, product, user  # noqa: F401 - register models on Base.metadata
 
 load_dotenv()
 

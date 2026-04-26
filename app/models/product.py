@@ -17,8 +17,4 @@ class ProductModel(Base):
     stock = Column(Integer, nullable=False, default=0)
 
     def __repr__(self):
-        return f"<ProductModel(id={self.id}, name={self.name}, price={self.price}, stock={self.stock})>"
-    
-
-# class ProductList(Base):
-#     id = 
+        return f"<ProductModel(id={self.id}, name={self.name}, price={self.price}, stock={self.stock})>" 
