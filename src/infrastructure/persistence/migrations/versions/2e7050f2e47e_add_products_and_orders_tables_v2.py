@@ -19,31 +19,37 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _table_exists(table_name: str) -> bool:
+    return table_name in sa.inspect(op.get_bind()).get_table_names()
+
+
 def upgrade() -> None:
     # Enable UUID extension
     op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
 
-    # Create products table
-    op.create_table(
-        'products',
-        sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
-        sa.Column('name', sa.String(length=255), nullable=False, index=True),
-        sa.Column('description', sa.String(), nullable=True),
-        sa.Column('price', sa.Float(), nullable=False),
-        sa.Column('stock', sa.Integer(), nullable=False, server_default='0'),
-    )
+    if not _table_exists('products'):
+        op.create_table(
+            'products',
+            sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
+            sa.Column('name', sa.String(length=255), nullable=False, index=True),
+            sa.Column('description', sa.String(), nullable=True),
+            sa.Column('price', sa.Float(), nullable=False),
+            sa.Column('stock', sa.Integer(), nullable=False, server_default='0'),
+        )
 
-    # Create orders table
-    op.create_table(
-        'orders',
-        sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
-        sa.Column('status', sa.String(length=50), nullable=False, server_default='pending'),
-        sa.Column('total_amount', sa.Float(), nullable=False, server_default='0.0'),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.now()),
-        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now()),
-    )
+    if not _table_exists('orders'):
+        op.create_table(
+            'orders',
+            sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
+            sa.Column('status', sa.String(length=50), nullable=False, server_default='pending'),
+            sa.Column('total_amount', sa.Float(), nullable=False, server_default='0.0'),
+            sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now()),
+        )
 
 
 def downgrade() -> None:
-    op.drop_table('orders')
-    op.drop_table('products')
+    if _table_exists('orders'):
+        op.drop_table('orders')
+    if _table_exists('products'):
+        op.drop_table('products')
