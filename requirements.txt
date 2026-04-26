@@ -8,3 +8,6 @@ psycopg2-binary
 python-dotenv
 alembic
 asyncpg
+python-jose[cryptography]
+email-validator
+pwdlib[argon2]
