@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class OrderItem(BaseModel):
-    product_id: int
+    product_id: UUID
     quantity: int
 
 
