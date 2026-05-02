@@ -21,12 +21,20 @@ class ProductResponse(BaseModel):
         from_attributes = True
 
 
-class ProductList(BaseModel):
-    id: UUID
-    name: str
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
     description: Optional[str] = None
-    price: float
-    stock: int
+    price: Optional[float] = None
+    stock: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+
+
+# class ProductList(BaseModel):
+#     id: UUID
+#     name: str
+#     description: Optional[str] = None
+#     price: float
+#     stock: int
+
+#     class Config:
+#         from_attributes = True

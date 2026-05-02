@@ -5,7 +5,6 @@ from typing import List
 from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.order import OrderModel, OrderDetailModel
 from app.models.product import ProductModel
@@ -131,3 +130,21 @@ async def order_detail_by_id(
         )
 
     return response
+
+async def delete_order_by_id(
+    db: AsyncSession,
+    order_id: UUID
+):
+    
+    stmt = select(OrderModel).where(OrderModel.id == order_id)
+    result = await db.execute(stmt)
+    order = result.scalar_one_or_none
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="order not found"
+        )
+    
+    await db.delete(order)
+    await db.commit()
