@@ -2,6 +2,7 @@ from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.api.v1.routes.auth import get_current_user
 from app.core.database import get_db
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
 from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id
@@ -12,14 +13,16 @@ router = APIRouter()
 @router.post("/create-product", response_model=ProductResponse)
 async def create_product_endpoint(
     product: ProductCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     return await create_product(db, product)
 
 
 @router.get("/list-products", response_model=List[ProductResponse])
 async def list_products_endpoint(
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     return await list_of_products(db)
 
@@ -27,7 +30,8 @@ async def list_products_endpoint(
 @router.get("/list-product/{product_id}", response_model=ProductResponse)
 async def list_product_endpoint(
     product_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     return await list_product_endpoint_by_id(db, product_id)
 
@@ -36,7 +40,8 @@ async def list_product_endpoint(
 async def update_product(
     product_id: UUID,
     update_product: ProductUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user)
 ):
     return await update_product_by_id(db, product_id, update_product)
 
@@ -44,6 +49,7 @@ async def update_product(
 @router.delete("/delete-product/{product_id}", status_code=204)
 async def delete_product(
     product_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user)
 ):
     await delete_product_by_id(db, product_id)

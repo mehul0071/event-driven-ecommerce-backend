@@ -138,7 +138,7 @@ async def delete_order_by_id(
     
     stmt = select(OrderModel).where(OrderModel.id == order_id)
     result = await db.execute(stmt)
-    order = result.scalar_one_or_none
+    order = result.scalar_one_or_none()
 
     if not order:
         raise HTTPException(
