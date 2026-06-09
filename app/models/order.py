@@ -14,16 +14,18 @@ class OrderModel(Base):
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4())
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+
     status = Column(String(50), nullable=False, default="pending")
     total_amount = Column(Numeric(10, 2), nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
+    user = relationship("UserModel", back_populates="orders")
     details = relationship("OrderDetailModel", back_populates="order", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Order(id={self.id}, status={self.status}, total={self.total_amount})>"
-
+        return f"<Order(id={self.id}, user_id={self.user_id}, status={self.status})>"
 
 class OrderDetailModel(Base):
     __tablename__ = "order_details"
@@ -35,6 +37,7 @@ class OrderDetailModel(Base):
     unit_price = Column(Numeric(10, 2), nullable=False)
 
     order = relationship("OrderModel", back_populates="details")
+    product = relationship("ProductModel")
 
     @property
     def subtotal(self) -> Decimal:
@@ -42,3 +45,4 @@ class OrderDetailModel(Base):
 
     def __repr__(self):
         return f"<OrderDetail(order_id={self.order_id}, product_id={self.product_id}, qty={self.quantity})>"
+    
