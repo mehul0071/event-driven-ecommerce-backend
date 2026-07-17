@@ -6,9 +6,8 @@ from app.models.product import ProductModel
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
 from app.core.database import AsyncSessionLocal
 from app.services.embedding_service import embedding_service
-
-
 from app.core.event_bus import event_bus
+from langfuse import observe
 
 
 async def update_product_embedding_bg(product_id: UUID, text_to_embed: str):
@@ -138,6 +137,7 @@ async def delete_product_by_id(
     await db.commit()
 
 
+@observe(name="semantic_search_products")
 async def semantic_search_products(
     db: AsyncSession,
     query_text: str,

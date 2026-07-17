@@ -14,3 +14,4 @@ pwdlib[argon2]
 pgvector
 pytest-asyncio
 redis
+langfuse

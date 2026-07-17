@@ -3,12 +3,15 @@ import httpx
 from typing import List
 from app.models.product import ProductModel
 
+from langfuse import observe
+
 class LLMService:
     def __init__(self):
         self.openai_key = os.getenv("OPENAI_API_KEY")
         self.hf_token = os.getenv("HF_TOKEN")
         self.hf_model = os.getenv("HF_LLM_MODEL", "mistralai/Mistral-7B-Instruct-v0.2")
 
+    @observe(as_type="generation")
     async def generate_rag_response(self, query: str, products: List[ProductModel]) -> str:
         if not products:
             context = "No products found in database."
@@ -20,12 +23,21 @@ class LLMService:
             context = "\n\n".join(context_items)
 
         system_prompt = (
-            "You are a helpful e-commerce support assistant. Below are products matching the user's inquiry:\n"
-            f"{context}\n\n"
-            "Use the product list above to answer the user's question accurately. "
-            "If no relevant products are present or context says 'No products found', tell the user we don't carry matching products. "
-            "Do not make up or hallucinate product details. Be concise and professional."
+            "You are an expert e-commerce customer support assistant.\n"
+            "Your goal is to answer the user's question accurately using ONLY the retrieved products listed below.\n\n"
+            "=== RETRIEVED PRODUCTS CONTEXT ===\n"
+            f"{context}\n"
+            "==================================\n\n"
+            "STRICT RULES FOR YOUR ANSWER:\n"
+            "1. ONLY base your answer on the retrieved products context above.\n"
+            "2. If the context contains 'No products found' or no products are relevant to the query, respond with: 'I'm sorry, we do not carry any products matching that description.' and do not suggest anything else.\n"
+            "3. DO NOT extrapolate, assume, or invent product details (like colors, sizes, or stock) not explicitly written in the context. Doing so is considered a hallucination and is strictly forbidden.\n"
+            "4. Mention prices and availability if relevant to the query.\n"
+            "5. Maintain a professional, concise, and helpful tone."
         )
+
+        result_text = None
+        model_name = "Mock-LLM-v1"
 
         if self.openai_key:
             try:
@@ -47,11 +59,12 @@ class LLMService:
                         timeout=15.0
                     )
                     if response.status_code == 200:
-                        return response.json()["choices"][0]["message"]["content"]
+                        result_text = response.json()["choices"][0]["message"]["content"]
+                        model_name = "gpt-4o-mini"
             except Exception as e:
                 print(f"[LLMService] OpenAI request failed: {e}")
 
-        if self.hf_token:
+        if not result_text and self.hf_token:
             try:
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
@@ -66,11 +79,36 @@ class LLMService:
                     if response.status_code == 200:
                         res = response.json()
                         if isinstance(res, list) and len(res) > 0:
-                            return res[0].get("generated_text", "").split("[/INST]")[-1].strip()
+                            result_text = res[0].get("generated_text", "").split("[/INST]")[-1].strip()
+                            model_name = self.hf_model
             except Exception as e:
                 print(f"[LLMService] HuggingFace Chat request failed: {e}")
 
-        return self._generate_mock_rag_response(query, products)
+        if not result_text:
+            result_text = self._generate_mock_rag_response(query, products)
+            model_name = "Mock-LLM-v1"
+
+        # Update Langfuse Generation metrics via OpenTelemetry attributes (SDK v4 native)
+        prompt_tokens = len(system_prompt + query) // 4
+        completion_tokens = len(result_text) // 4
+        try:
+            from opentelemetry import trace
+            import json
+            current_span = trace.get_current_span()
+            if current_span and current_span.is_recording():
+                current_span.set_attribute("langfuse.observation.model.name", model_name)
+                current_span.set_attribute(
+                    "langfuse.observation.usage_details",
+                    json.dumps({
+                        "prompt_tokens": prompt_tokens,
+                        "completion_tokens": completion_tokens,
+                        "total_tokens": prompt_tokens + completion_tokens
+                    })
+                )
+        except Exception:
+            pass
+
+        return result_text
 
     def _generate_mock_rag_response(self, query: str, products: List[ProductModel]) -> str:
         if not products:

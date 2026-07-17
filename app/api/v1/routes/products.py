@@ -8,6 +8,7 @@ from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id, semantic_search_products
 from app.services.llm_service import llm_service
+from langfuse import observe
 
 router = APIRouter()
 
@@ -69,10 +70,20 @@ async def search_products(
 
 
 @router.post("/chat", response_model=ChatResponse)
+@observe(name="chat_with_catalog")
 async def chat_with_catalog(
     chat_request: ChatRequest,
     db: AsyncSession = Depends(get_db)
 ):
+    try:
+        from opentelemetry import trace
+        current_span = trace.get_current_span()
+        if current_span and current_span.is_recording():
+            current_span.set_attribute("langfuse.trace.tags", ["rag_chatbot_query"])
+            current_span.set_attribute("langfuse.trace.input", chat_request.query)
+    except Exception:
+        pass
+
     products = await semantic_search_products(db, chat_request.query, chat_request.limit)
     answer = await llm_service.generate_rag_response(chat_request.query, products)
     
