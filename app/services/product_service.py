@@ -8,6 +8,9 @@ from app.core.database import AsyncSessionLocal
 from app.services.embedding_service import embedding_service
 
 
+from app.core.event_bus import event_bus
+
+
 async def update_product_embedding_bg(product_id: UUID, text_to_embed: str):
     async with AsyncSessionLocal() as db:
         embedding = await embedding_service.generate_embedding(text_to_embed)
@@ -36,7 +39,13 @@ async def create_product(
     await db.refresh(product)
     
     text_to_embed = f"{product.name} {product.description or ''}"
-    background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
+    published = await event_bus.publish(
+        channel="product_events",
+        event_type="product_created",
+        data={"product_id": str(product.id), "text_to_embed": text_to_embed}
+    )
+    if not published:
+        background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
     
     return product
 
@@ -100,7 +109,13 @@ async def update_product_by_id(
     await db.refresh(product)
 
     text_to_embed = f"{product.name} {product.description or ''}"
-    background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
+    published = await event_bus.publish(
+        channel="product_events",
+        event_type="product_updated",
+        data={"product_id": str(product.id), "text_to_embed": text_to_embed}
+    )
+    if not published:
+        background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
 
     return product
 

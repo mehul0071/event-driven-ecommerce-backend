@@ -5,7 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.routes.auth import get_current_user
 from app.core.database import get_db
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id, semantic_search_products
+from app.services.llm_service import llm_service
 
 router = APIRouter()
 
@@ -13,9 +15,8 @@ router = APIRouter()
 @router.post("/create-product", response_model=ProductResponse)
 async def create_product_endpoint(
     product: ProductCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(get_current_user),
     background_tasks: BackgroundTasks,
+    current_user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     return await create_product(db, product, background_tasks)
@@ -42,9 +43,8 @@ async def list_product_endpoint(
 async def update_product(
     product_id: UUID,
     update_product: ProductUpdate,
-    db: AsyncSession = Depends(get_db),
-    user = Depends(get_current_user),
     background_tasks: BackgroundTasks,
+    user = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     return await update_product_by_id(db, product_id, update_product, background_tasks)
@@ -66,3 +66,17 @@ async def search_products(
     db: AsyncSession = Depends(get_db)
 ):
     return await semantic_search_products(db, query, limit)
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_with_catalog(
+    chat_request: ChatRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    products = await semantic_search_products(db, chat_request.query, chat_request.limit)
+    answer = await llm_service.generate_rag_response(chat_request.query, products)
+    
+    return ChatResponse(
+        answer=answer,
+        retrieved_products=products
+    )
