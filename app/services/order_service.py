@@ -61,6 +61,11 @@ async def create_order(db, order: OrderCreate, background_tasks):
     await db.commit()
     await db.refresh(new_order)
 
+    event = OrderCreatedEvent(order_id=new_order.id, occurred_at=datetime.utcnow())
+    background_tasks.add_task(handle_inventory, event)
+    background_tasks.add_task(handle_payment, event)
+    background_tasks.add_task(handle_notification, event)
+
     return {
         "order_id": new_order.id,
         "status": new_order.status,

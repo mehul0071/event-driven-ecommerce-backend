@@ -1,10 +1,10 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
-from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id
+from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id, semantic_search_products
 
 router = APIRouter()
 
@@ -12,9 +12,10 @@ router = APIRouter()
 @router.post("/create-product", response_model=ProductResponse)
 async def create_product_endpoint(
     product: ProductCreate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
-    return await create_product(db, product)
+    return await create_product(db, product, background_tasks)
 
 
 @router.get("/list-products", response_model=List[ProductResponse])
@@ -36,9 +37,10 @@ async def list_product_endpoint(
 async def update_product(
     product_id: UUID,
     update_product: ProductUpdate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
-    return await update_product_by_id(db, product_id, update_product)
+    return await update_product_by_id(db, product_id, update_product, background_tasks)
 
 
 @router.delete("/delete-product/{product_id}", status_code=204)
@@ -47,3 +49,12 @@ async def delete_product(
     db: AsyncSession = Depends(get_db)
 ):
     await delete_product_by_id(db, product_id)
+
+
+@router.get("/search", response_model=List[ProductResponse])
+async def search_products(
+    query: str,
+    limit: int = 5,
+    db: AsyncSession = Depends(get_db)
+):
+    return await semantic_search_products(db, query, limit)

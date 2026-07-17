@@ -33,7 +33,7 @@ async def order_detail(
     return await order_detail_by_id(db, order_id)
 
 
-@router.delete("/delete-order/{order_id}", response_model=204)
+@router.delete("/delete-order/{order_id}", status_code=204)
 async def delete_order(
     order_id: UUID,
     db: AsyncSession = Depends(get_db)
