@@ -1,6 +1,7 @@
 from uuid import uuid4
 from sqlalchemy import Column, Integer, String, Float, func
 from sqlalchemy.dialects.postgresql import UUID
+from pgvector.sqlalchemy import Vector
 from app.core.database import Base
 
 class ProductModel(Base):
@@ -16,6 +17,7 @@ class ProductModel(Base):
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
     stock = Column(Integer, nullable=False, default=0)
+    embedding = Column(Vector(384), nullable=True)
 
     def __repr__(self):
         return f"<ProductModel(id={self.id}, name={self.name}, price={self.price}, stock={self.stock})>" 

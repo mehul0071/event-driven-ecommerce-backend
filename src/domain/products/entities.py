@@ -10,6 +10,7 @@ class Product:
     description: str = ""
     price: float = 0.0
     stock: int = 0
+    embedding: Optional[list[float]] = None
 
     def __post_init__(self):
         if self.id == None:

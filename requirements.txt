@@ -11,3 +11,5 @@ asyncpg
 python-jose[cryptography]
 email-validator
 pwdlib[argon2]
+pgvector
+pytest-asyncio

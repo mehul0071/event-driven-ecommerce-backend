@@ -14,14 +14,15 @@ class SQLProductRepository(ProductRepository):
     async def get_by_id(self, id: UUID) -> Optional[Product]:
         stmt = select(ProductModel).where(ProductModel.id == id)
         result = await self.session.execute(stmt)
-        model = result.scalar_one_or_none
+        model = result.scalar_one_or_none()
         if model:
             return Product(
                 id = model.id,
                 name = model.name,
                 description=model.description,
                 price = model.price,
-                stock = model.stock
+                stock = model.stock,
+                embedding = model.embedding
             )
         return None
         
@@ -34,7 +35,8 @@ class SQLProductRepository(ProductRepository):
             name=m.name,
             description=m.description,
             price=m.price,
-            stock=m.stock
+            stock=m.stock,
+            embedding=m.embedding
         ) for m in models]
     
     async def add_product(self, product:Product) -> Product:
@@ -42,7 +44,8 @@ class SQLProductRepository(ProductRepository):
              name = product.name,
              description = product.description,
              price = product.price,
-             stock = product.stock
+             stock = product.stock,
+             embedding = product.embedding
         )
         self.session.add(model)
         await self.session.flush()
@@ -54,7 +57,8 @@ class SQLProductRepository(ProductRepository):
             name=product.name,
             description=product.description,
             price=product.price,
-            stock=product.stock
+            stock=product.stock,
+            embedding=product.embedding
         ).returning(ProductModel)
         result = await self.session.execute(stmt)
         updated_model = result.scalar_one()
@@ -63,9 +67,28 @@ class SQLProductRepository(ProductRepository):
             name=updated_model.name,
             description=updated_model.description,
             price=updated_model.price,
-            stock=updated_model.stock
+            stock=updated_model.stock,
+            embedding=updated_model.embedding
         )
     
     async def delete(self, id: UUID) -> None:
         stmt = delete(ProductModel).where(ProductModel.id == id)
         await self.session.execute(stmt)
+
+    async def semantic_search(self, query_vector: List[float], limit: int = 5) -> List[Product]:
+        stmt = (
+            select(ProductModel)
+            .where(ProductModel.embedding.isnot(None))
+            .order_by(ProductModel.embedding.cosine_distance(query_vector))
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [Product(
+            id=m.id,
+            name=m.name,
+            description=m.description,
+            price=m.price,
+            stock=m.stock,
+            embedding=m.embedding
+        ) for m in models]

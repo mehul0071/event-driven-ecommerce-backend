@@ -14,13 +14,17 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    async def add(self, product: Product) -> Product:
+    async def add_product(self, product: Product) -> Product:
         pass
 
     @abstractmethod
-    async def update(self, product: Product) -> Product:
+    async def update_product(self, product: Product) -> Product:
         pass
 
     @abstractmethod
     async def delete(self, id: UUID) -> None:
+        pass
+
+    @abstractmethod
+    async def semantic_search(self, query_vector: List[float], limit: int = 5) -> List[Product]:
         pass

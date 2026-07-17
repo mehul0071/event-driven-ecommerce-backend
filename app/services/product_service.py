@@ -1,24 +1,43 @@
 from uuid import UUID
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.product import ProductModel
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from app.core.database import AsyncSessionLocal
+from app.services.embedding_service import embedding_service
+
+
+async def update_product_embedding_bg(product_id: UUID, text_to_embed: str):
+    async with AsyncSessionLocal() as db:
+        embedding = await embedding_service.generate_embedding(text_to_embed)
+        stmt = select(ProductModel).where(ProductModel.id == product_id)
+        result = await db.execute(stmt)
+        product = result.scalar_one_or_none()
+        if product:
+            product.embedding = embedding
+            await db.commit()
+            print(f"[AI Ingestion] Generated and saved embedding for product {product.id}")
 
 
 async def create_product(
     db: AsyncSession,
-    product: ProductCreate
+    product: ProductCreate,
+    background_tasks: BackgroundTasks
 ):
     product = ProductModel(
         name=product.name,
         description=product.description,
         price=product.price,
         stock=product.stock,
-)   
+    )   
     db.add(product)
     await db.commit()
     await db.refresh(product)
+    
+    text_to_embed = f"{product.name} {product.description or ''}"
+    background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
+    
     return product
 
 
@@ -52,7 +71,8 @@ async def list_product_endpoint_by_id(
 async def update_product_by_id(
     db: AsyncSession,
     product_id: UUID,
-    product_update: ProductUpdate
+    product_update: ProductUpdate,
+    background_tasks: BackgroundTasks
 ) -> ProductUpdate:
     
     stmt = select(ProductModel).where(ProductModel.id == product_id)
@@ -79,6 +99,9 @@ async def update_product_by_id(
     await db.commit()
     await db.refresh(product)
 
+    text_to_embed = f"{product.name} {product.description or ''}"
+    background_tasks.add_task(update_product_embedding_bg, product.id, text_to_embed)
+
     return product
 
 
@@ -98,3 +121,19 @@ async def delete_product_by_id(
 
     await db.delete(product)
     await db.commit()
+
+
+async def semantic_search_products(
+    db: AsyncSession,
+    query_text: str,
+    limit: int = 5
+) -> list[ProductModel]:
+    query_vector = await embedding_service.generate_embedding(query_text)
+    stmt = (
+        select(ProductModel)
+        .where(ProductModel.embedding.isnot(None))
+        .order_by(ProductModel.embedding.cosine_distance(query_vector))
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+    return result.scalars().all()
