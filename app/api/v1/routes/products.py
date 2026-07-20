@@ -9,6 +9,8 @@ from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id, semantic_search_products
 from app.services.llm_service import llm_service
 from langfuse import observe
+from app.schemas.interaction import UserInteractionCreate, UserInteractionResponse
+from app.services.interaction_service import log_user_interaction, get_hybrid_recommendations
 
 router = APIRouter()
 
@@ -85,9 +87,29 @@ async def chat_with_catalog(
         pass
 
     products = await semantic_search_products(db, chat_request.query, chat_request.limit)
-    answer = await llm_service.generate_rag_response(chat_request.query, products)
+    bot_response = await llm_service.generate_rag_response(chat_request.query, products)
     
     return ChatResponse(
-        answer=answer,
+        answer=bot_response.response,
+        recommended_product_ids=bot_response.recommended_product_ids,
+        follow_up_questions=bot_response.follow_up_questions,
         retrieved_products=products
     )
+
+
+@router.post("/interactions", response_model=UserInteractionResponse)
+async def log_interaction(
+    interaction: UserInteractionCreate,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    return await log_user_interaction(db, current_user.id, interaction)
+
+
+@router.get("/recommendations", response_model=List[ProductResponse])
+async def recommend_products(
+    limit: int = 5,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    return await get_hybrid_recommendations(db, current_user.id, limit)

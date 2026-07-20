@@ -9,10 +9,24 @@ class EmbeddingService:
         self.hf_token = os.getenv("HF_TOKEN")
         self.hf_model = os.getenv("HF_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
         self.dimension = 384
+        self.local_model = None
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.local_model = SentenceTransformer(self.hf_model)
+            print(f"[EmbeddingService] Successfully loaded local SentenceTransformer model '{self.hf_model}'")
+        except Exception as e:
+            print(f"[EmbeddingService] Warning: Failed to load local SentenceTransformer: {e}. Will fall back to HF API / mock.")
 
     async def generate_embedding(self, text: str) -> List[float]:
         if not text or not text.strip():
             return [0.0] * self.dimension
+
+        if self.local_model:
+            try:
+                embedding = self.local_model.encode(text)
+                return [float(x) for x in embedding]
+            except Exception as e:
+                print(f"[EmbeddingService] Local encoding failed: {e}. Trying API fallback...")
 
         try:
             headers = {}
@@ -46,27 +60,46 @@ class EmbeddingService:
         text_lower = text.lower()
         keywords = {
             "camping": 10,
-            "sleeping": 20,
-            "bag": 30,
-            "winter": 40,
-            "cold": 50,
-            "mountain": 60,
-            "gear": 70,
-            "weather": 80,
+            "sleeping": 10,
+            "bag": 10,
+            "winter": 10,
+            "cold": 10,
+            "mountain": 10,
+            "gear": 10,
+            "weather": 10,
+            "stove": 10,
+            "backpack": 10,
+            "tent": 10,
+            
             "chef": 90,
-            "knife": 100,
-            "kitchen": 110,
-            "steel": 120,
-            "vegetables": 130,
-            "cooking": 140,
-            "sharp": 150,
-            "utensil": 160,
+            "knife": 90,
+            "kitchen": 90,
+            "steel": 90,
+            "vegetables": 90,
+            "cooking": 90,
+            "sharp": 90,
+            "utensil": 90,
+            "circulator": 90,
+            "skillet": 90,
+
+            "dumbbell": 200,
+            "fitness": 200,
+            "yoga": 200,
+            "mat": 200,
+
+            "keyboard": 240,
+            "chair": 240,
+            "headphones": 240,
+            "monitor": 240,
+
+            "espresso": 280,
+            "coffee": 280,
         }
         
         vector = [0.0] * self.dimension
         
         for word, idx in keywords.items():
-            if word in text_lower:
+            if word in text_lower or text_lower in word or (len(text_lower) >= 4 and word.startswith(text_lower[:4])):
                 vector[idx] = 10.0 
                 
         hash_object = hashlib.sha256(text.encode('utf-8'))

@@ -1,0 +1,752 @@
+[
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New red backpack in 8-inch. Retails for $138.29. 64 left in stock!",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"red\", \"size\": \"8-inch\", \"price\": 138.29, \"stock\": 64}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: camping stove. Dimensions: standard. Color: yellow. Price: $369.64. Stock: 77.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"yellow\", \"size\": \"standard\", \"price\": 369.64, \"stock\": 77}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest dumbbell set (black, 34-inch). We have 25 available at only $301.90 each.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"black\", \"size\": \"34-inch\", \"price\": 301.9, \"stock\": 25}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: mechanical keyboard! Specifications: Color: red, Size: small, Price: $48.28, Quantity: 35 units.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"red\", \"size\": \"small\", \"price\": 48.28, \"stock\": 35}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: dumbbell set! Specifications: Color: none, Size: compact, Price: $91.95, Quantity: 43 units.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": null, \"size\": \"compact\", \"price\": 91.95, \"stock\": 43}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest dumbbell set (white, small). We have 53 available at only $439.11 each.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"white\", \"size\": \"small\", \"price\": 439.11, \"stock\": 53}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 34-inch yellow noise cancelling headphones for $88.01. Stock level: 65 items.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"yellow\", \"size\": \"34-inch\", \"price\": 88.01, \"stock\": 65}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new standard espresso machine in elegant orange finish. Retailing at $209.66 with 52 items in stock.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"orange\", \"size\": \"standard\", \"price\": 209.66, \"stock\": 52}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 8-inch red gaming monitor for $83.18. Stock level: 69 items.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"red\", \"size\": \"8-inch\", \"price\": 83.18, \"stock\": 69}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: chef knife! Specifications: Color: orange, Size: 8-inch, Price: $302.06, Quantity: 76 units.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"orange\", \"size\": \"8-inch\", \"price\": 302.06, \"stock\": 76}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest cast iron skillet (none, 8-inch). We have 3 available at only $72.59 each.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": null, \"size\": \"8-inch\", \"price\": 72.59, \"stock\": 3}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest sleeping bag (gray, 8-inch). We have 51 available at only $373.10 each.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"gray\", \"size\": \"8-inch\", \"price\": 373.1, \"stock\": 51}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New orange dumbbell set in 8-inch. Retails for $206.39. 0 left in stock!",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"8-inch\", \"price\": 206.39, \"stock\": 0}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: camping stove! Specifications: Color: green, Size: none, Price: $148.69, Quantity: 43 units.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"green\", \"size\": null, \"price\": 148.69, \"stock\": 43}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: sleeping bag! Specifications: Color: blue, Size: small, Price: $314.97, Quantity: 19 units.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"blue\", \"size\": \"small\", \"price\": 314.97, \"stock\": 19}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest mechanical keyboard (gray, large). We have 50 available at only $300.25 each.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"gray\", \"size\": \"large\", \"price\": 300.25, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New orange noise cancelling headphones in 12-inch. Retails for $96.72. 52 left in stock!",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"12-inch\", \"price\": 96.72, \"stock\": 52}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 12-inch gaming monitor in elegant blue finish. Retailing at $242.98 with 55 items in stock.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"blue\", \"size\": \"12-inch\", \"price\": 242.98, \"stock\": 55}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: noise cancelling headphones! Specifications: Color: white, Size: large, Price: $352.83, Quantity: 25 units.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"white\", \"size\": \"large\", \"price\": 352.83, \"stock\": 25}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: noise cancelling headphones. Dimensions: 34-inch. Color: silver. Price: $21.44. Stock: 37.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 21.44, \"stock\": 37}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 50 units of the new orange office chair in size medium for $437.65.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 437.65, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: orange camping tent (8-inch) is now $128.94. Hurry, only 14 remaining!",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"8-inch\", \"price\": 128.94, \"stock\": 14}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: gaming monitor. Dimensions: large. Color: orange. Price: $367.55. Stock: 17.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"large\", \"price\": 367.55, \"stock\": 17}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 47 units of the new white mechanical keyboard in size 34-inch for $151.26.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"white\", \"size\": \"34-inch\", \"price\": 151.26, \"stock\": 47}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 32 units of the new silver gaming monitor in size large for $383.07.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"silver\", \"size\": \"large\", \"price\": 383.07, \"stock\": 32}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 8-inch sleeping bag in elegant orange finish. Retailing at $352.73 with 55 items in stock.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"8-inch\", \"price\": 352.73, \"stock\": 55}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: camping stove. Dimensions: small. Color: white. Price: $298.10. Stock: 16.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"small\", \"price\": 298.1, \"stock\": 16}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new small camping stove in elegant none finish. Retailing at $436.42 with 20 items in stock.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": null, \"size\": \"small\", \"price\": 436.42, \"stock\": 20}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New none noise cancelling headphones in compact. Retails for $19.80. 31 left in stock!",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": null, \"size\": \"compact\", \"price\": 19.8, \"stock\": 31}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: gaming monitor. Dimensions: small. Color: none. Price: $89.10. Stock: 1.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": null, \"size\": \"small\", \"price\": 89.1, \"stock\": 1}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest cast iron skillet (white, 8-inch). We have 40 available at only $380.42 each.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"white\", \"size\": \"8-inch\", \"price\": 380.42, \"stock\": 40}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest noise cancelling headphones (orange, medium). We have 32 available at only $274.00 each.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 274.0, \"stock\": 32}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 36 units of the new black office chair in size small for $116.87.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"black\", \"size\": \"small\", \"price\": 116.87, \"stock\": 36}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest fitness tracker (red, small). We have 23 available at only $81.57 each.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"red\", \"size\": \"small\", \"price\": 81.57, \"stock\": 23}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New white backpack in compact. Retails for $70.24. 53 left in stock!",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"compact\", \"price\": 70.24, \"stock\": 53}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest mechanical keyboard (orange, none). We have 41 available at only $78.57 each.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"orange\", \"size\": null, \"price\": 78.57, \"stock\": 41}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: silver camping tent (standard) is now $18.47. Hurry, only 25 remaining!",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"silver\", \"size\": \"standard\", \"price\": 18.47, \"stock\": 25}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 78 units of the new red espresso machine in size medium for $294.69.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"red\", \"size\": \"medium\", \"price\": 294.69, \"stock\": 78}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 67 units of the new black sleeping bag in size small for $44.03.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"black\", \"size\": \"small\", \"price\": 44.03, \"stock\": 67}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest yoga mat (none, none). We have 44 available at only $356.19 each.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": null, \"size\": null, \"price\": 356.19, \"stock\": 44}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 8-inch noise cancelling headphones in elegant none finish. Retailing at $62.38 with 74 items in stock.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": null, \"size\": \"8-inch\", \"price\": 62.38, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 13 units of the new green noise cancelling headphones in size medium for $202.23.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"green\", \"size\": \"medium\", \"price\": 202.23, \"stock\": 13}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 8-inch camping tent in elegant none finish. Retailing at $327.77 with 44 items in stock.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": null, \"size\": \"8-inch\", \"price\": 327.77, \"stock\": 44}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New yellow camping tent in standard. Retails for $305.34. 7 left in stock!",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"yellow\", \"size\": \"standard\", \"price\": 305.34, \"stock\": 7}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: mechanical keyboard. Dimensions: medium. Color: gray. Price: $192.91. Stock: 50.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"gray\", \"size\": \"medium\", \"price\": 192.91, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new none dumbbell set in elegant red finish. Retailing at $89.42 with 2 items in stock.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"red\", \"size\": null, \"price\": 89.42, \"stock\": 2}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New green camping tent in medium. Retails for $128.43. 57 left in stock!",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"green\", \"size\": \"medium\", \"price\": 128.43, \"stock\": 57}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling large white espresso machine for $430.14. Stock level: 73 items.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"white\", \"size\": \"large\", \"price\": 430.14, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new compact fitness tracker in elegant gray finish. Retailing at $84.23 with 9 items in stock.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"gray\", \"size\": \"compact\", \"price\": 84.23, \"stock\": 9}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New none gaming monitor in medium. Retails for $86.62. 29 left in stock!",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": null, \"size\": \"medium\", \"price\": 86.62, \"stock\": 29}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest camping stove (gray, 34-inch). We have 4 available at only $76.61 each.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"gray\", \"size\": \"34-inch\", \"price\": 76.61, \"stock\": 4}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest mechanical keyboard (none, small). We have 0 available at only $233.66 each.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": null, \"size\": \"small\", \"price\": 233.66, \"stock\": 0}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: camping tent! Specifications: Color: yellow, Size: large, Price: $132.33, Quantity: 73 units.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"yellow\", \"size\": \"large\", \"price\": 132.33, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: office chair! Specifications: Color: red, Size: 12-inch, Price: $125.50, Quantity: 77 units.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"red\", \"size\": \"12-inch\", \"price\": 125.5, \"stock\": 77}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New white mechanical keyboard in compact. Retails for $35.69. 74 left in stock!",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"white\", \"size\": \"compact\", \"price\": 35.69, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New none camping tent in 34-inch. Retails for $426.90. 50 left in stock!",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": null, \"size\": \"34-inch\", \"price\": 426.9, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: orange gaming monitor (standard) is now $342.85. Hurry, only 1 remaining!",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"standard\", \"price\": 342.85, \"stock\": 1}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: noise cancelling headphones. Dimensions: small. Color: orange. Price: $250.79. Stock: 2.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"small\", \"price\": 250.79, \"stock\": 2}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: camping tent. Dimensions: small. Color: white. Price: $420.10. Stock: 34.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"small\", \"price\": 420.1, \"stock\": 34}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new compact yoga mat in elegant blue finish. Retailing at $233.55 with 67 items in stock.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"blue\", \"size\": \"compact\", \"price\": 233.55, \"stock\": 67}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest fitness tracker (gray, 12-inch). We have 75 available at only $355.25 each.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"gray\", \"size\": \"12-inch\", \"price\": 355.25, \"stock\": 75}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new compact mechanical keyboard in elegant orange finish. Retailing at $156.02 with 64 items in stock.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"compact\", \"price\": 156.02, \"stock\": 64}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling medium gray espresso machine for $56.57. Stock level: 49 items.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"gray\", \"size\": \"medium\", \"price\": 56.57, \"stock\": 49}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 66 units of the new silver yoga mat in size small for $238.16.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"silver\", \"size\": \"small\", \"price\": 238.16, \"stock\": 66}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: green mechanical keyboard (small) is now $424.35. Hurry, only 71 remaining!",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"green\", \"size\": \"small\", \"price\": 424.35, \"stock\": 71}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest office chair (blue, medium). We have 77 available at only $155.46 each.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"blue\", \"size\": \"medium\", \"price\": 155.46, \"stock\": 77}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 69 units of the new blue camping tent in size none for $96.65.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"blue\", \"size\": null, \"price\": 96.65, \"stock\": 69}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling large orange fitness tracker for $69.77. Stock level: 27 items.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"large\", \"price\": 69.77, \"stock\": 27}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: sleeping bag. Dimensions: 34-inch. Color: orange. Price: $134.98. Stock: 71.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"34-inch\", \"price\": 134.98, \"stock\": 71}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: blue cast iron skillet (compact) is now $144.79. Hurry, only 38 remaining!",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"blue\", \"size\": \"compact\", \"price\": 144.79, \"stock\": 38}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: gray yoga mat (compact) is now $422.81. Hurry, only 74 remaining!",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"gray\", \"size\": \"compact\", \"price\": 422.81, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 12-inch camping tent in elegant black finish. Retailing at $341.24 with 66 items in stock.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"black\", \"size\": \"12-inch\", \"price\": 341.24, \"stock\": 66}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: camping tent! Specifications: Color: white, Size: small, Price: $380.38, Quantity: 75 units.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"small\", \"price\": 380.38, \"stock\": 75}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest noise cancelling headphones (green, 34-inch). We have 22 available at only $153.75 each.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"green\", \"size\": \"34-inch\", \"price\": 153.75, \"stock\": 22}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling medium none mechanical keyboard for $262.12. Stock level: 35 items.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": null, \"size\": \"medium\", \"price\": 262.12, \"stock\": 35}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 7 units of the new silver gaming monitor in size 34-inch for $412.18.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 412.18, \"stock\": 7}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 34-inch gaming monitor in elegant silver finish. Retailing at $413.51 with 80 items in stock.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 413.51, \"stock\": 80}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: white noise cancelling headphones (large) is now $257.67. Hurry, only 61 remaining!",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"white\", \"size\": \"large\", \"price\": 257.67, \"stock\": 61}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 34-inch silver sleeping bag for $447.50. Stock level: 73 items.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 447.5, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New orange espresso machine in none. Retails for $106.06. 72 left in stock!",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"orange\", \"size\": null, \"price\": 106.06, \"stock\": 72}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 78 units of the new none gaming monitor in size standard for $290.96.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": null, \"size\": \"standard\", \"price\": 290.96, \"stock\": 78}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling none red camping tent for $410.19. Stock level: 41 items.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"red\", \"size\": null, \"price\": 410.19, \"stock\": 41}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: sleeping bag! Specifications: Color: gray, Size: large, Price: $122.31, Quantity: 13 units.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"gray\", \"size\": \"large\", \"price\": 122.31, \"stock\": 13}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: yoga mat! Specifications: Color: white, Size: 8-inch, Price: $82.09, Quantity: 7 units.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"white\", \"size\": \"8-inch\", \"price\": 82.09, \"stock\": 7}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new none office chair in elegant red finish. Retailing at $234.01 with 27 items in stock.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"red\", \"size\": null, \"price\": 234.01, \"stock\": 27}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New white camping stove in standard. Retails for $328.95. 61 left in stock!",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"standard\", \"price\": 328.95, \"stock\": 61}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 64 units of the new black backpack in size large for $329.62.",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"black\", \"size\": \"large\", \"price\": 329.62, \"stock\": 64}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 34-inch white yoga mat for $104.26. Stock level: 50 items.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"white\", \"size\": \"34-inch\", \"price\": 104.26, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new none office chair in elegant silver finish. Retailing at $166.39 with 22 items in stock.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"silver\", \"size\": null, \"price\": 166.39, \"stock\": 22}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new compact sleeping bag in elegant none finish. Retailing at $304.69 with 49 items in stock.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": null, \"size\": \"compact\", \"price\": 304.69, \"stock\": 49}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: noise cancelling headphones! Specifications: Color: black, Size: medium, Price: $109.38, Quantity: 31 units.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"black\", \"size\": \"medium\", \"price\": 109.38, \"stock\": 31}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 5 units of the new orange office chair in size large for $144.80.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"large\", \"price\": 144.8, \"stock\": 5}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: yoga mat! Specifications: Color: gray, Size: large, Price: $328.06, Quantity: 8 units.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"gray\", \"size\": \"large\", \"price\": 328.06, \"stock\": 8}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: backpack. Dimensions: 34-inch. Color: green. Price: $358.84. Stock: 43.",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"green\", \"size\": \"34-inch\", \"price\": 358.84, \"stock\": 43}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: dumbbell set! Specifications: Color: silver, Size: standard, Price: $101.09, Quantity: 10 units.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"silver\", \"size\": \"standard\", \"price\": 101.09, \"stock\": 10}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: fitness tracker! Specifications: Color: orange, Size: standard, Price: $125.24, Quantity: 42 units.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"standard\", \"price\": 125.24, \"stock\": 42}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 32 units of the new red yoga mat in size compact for $80.56.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"red\", \"size\": \"compact\", \"price\": 80.56, \"stock\": 32}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new standard yoga mat in elegant orange finish. Retailing at $433.93 with 4 items in stock.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"standard\", \"price\": 433.93, \"stock\": 4}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 12-inch fitness tracker in elegant silver finish. Retailing at $372.95 with 75 items in stock.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"silver\", \"size\": \"12-inch\", \"price\": 372.95, \"stock\": 75}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: chef knife. Dimensions: medium. Color: orange. Price: $242.70. Stock: 6.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 242.7, \"stock\": 6}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new large noise cancelling headphones in elegant none finish. Retailing at $285.74 with 29 items in stock.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": null, \"size\": \"large\", \"price\": 285.74, \"stock\": 29}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 42 units of the new yellow espresso machine in size compact for $296.31.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"yellow\", \"size\": \"compact\", \"price\": 296.31, \"stock\": 42}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest chef knife (gray, none). We have 21 available at only $238.34 each.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"gray\", \"size\": null, \"price\": 238.34, \"stock\": 21}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest camping tent (yellow, 8-inch). We have 74 available at only $219.47 each.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"yellow\", \"size\": \"8-inch\", \"price\": 219.47, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: cast iron skillet! Specifications: Color: gray, Size: large, Price: $191.67, Quantity: 50 units.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"gray\", \"size\": \"large\", \"price\": 191.67, \"stock\": 50}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest dumbbell set (none, small). We have 75 available at only $182.00 each.",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": null, \"size\": \"small\", \"price\": 182.0, \"stock\": 75}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: chef knife. Dimensions: large. Color: silver. Price: $216.37. Stock: 36.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"silver\", \"size\": \"large\", \"price\": 216.37, \"stock\": 36}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new medium camping stove in elegant orange finish. Retailing at $404.09 with 79 items in stock.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 404.09, \"stock\": 79}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest cast iron skillet (white, 34-inch). We have 68 available at only $60.00 each.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"white\", \"size\": \"34-inch\", \"price\": 60.0, \"stock\": 68}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New orange dumbbell set in 34-inch. Retails for $375.09. 61 left in stock!",
+    "output": "{\"name\": \"dumbbell set\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"34-inch\", \"price\": 375.09, \"stock\": 61}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling compact none noise cancelling headphones for $423.12. Stock level: 2 items.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": null, \"size\": \"compact\", \"price\": 423.12, \"stock\": 2}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest mechanical keyboard (black, compact). We have 9 available at only $138.28 each.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"black\", \"size\": \"compact\", \"price\": 138.28, \"stock\": 9}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: office chair! Specifications: Color: silver, Size: 34-inch, Price: $405.67, Quantity: 73 units.",
+    "output": "{\"name\": \"office chair\", \"category\": \"office\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 405.67, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New blue yoga mat in 8-inch. Retails for $206.85. 22 left in stock!",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"blue\", \"size\": \"8-inch\", \"price\": 206.85, \"stock\": 22}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest backpack (silver, 34-inch). We have 12 available at only $319.69 each.",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"silver\", \"size\": \"34-inch\", \"price\": 319.69, \"stock\": 12}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest sleeping bag (none, none). We have 79 available at only $341.17 each.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": null, \"size\": null, \"price\": 341.17, \"stock\": 79}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: espresso machine! Specifications: Color: orange, Size: standard, Price: $312.94, Quantity: 8 units.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"orange\", \"size\": \"standard\", \"price\": 312.94, \"stock\": 8}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 12-inch noise cancelling headphones in elegant red finish. Retailing at $314.70 with 36 items in stock.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"red\", \"size\": \"12-inch\", \"price\": 314.7, \"stock\": 36}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest camping tent (orange, large). We have 11 available at only $342.74 each.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"large\", \"price\": 342.74, \"stock\": 11}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Check out our latest mechanical keyboard (blue, standard). We have 10 available at only $373.29 each.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"blue\", \"size\": \"standard\", \"price\": 373.29, \"stock\": 10}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new none yoga mat in elegant yellow finish. Retailing at $29.17 with 34 items in stock.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"yellow\", \"size\": null, \"price\": 29.17, \"stock\": 34}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: white yoga mat (none) is now $88.34. Hurry, only 49 remaining!",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"white\", \"size\": null, \"price\": 88.34, \"stock\": 49}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "We have 71 units of the new yellow mechanical keyboard in size 8-inch for $310.16.",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": \"yellow\", \"size\": \"8-inch\", \"price\": 310.16, \"stock\": 71}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 12-inch black sleeping bag for $182.43. Stock level: 42 items.",
+    "output": "{\"name\": \"sleeping bag\", \"category\": \"outdoors\", \"color\": \"black\", \"size\": \"12-inch\", \"price\": 182.43, \"stock\": 42}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new small espresso machine in elegant blue finish. Retailing at $241.86 with 74 items in stock.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"blue\", \"size\": \"small\", \"price\": 241.86, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: backpack. Dimensions: medium. Color: orange. Price: $166.66. Stock: 74.",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 166.66, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: yellow yoga mat (34-inch) is now $424.74. Hurry, only 74 remaining!",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"yellow\", \"size\": \"34-inch\", \"price\": 424.74, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling compact blue cast iron skillet for $389.40. Stock level: 75 items.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"blue\", \"size\": \"compact\", \"price\": 389.4, \"stock\": 75}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling large white backpack for $91.22. Stock level: 8 items.",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"white\", \"size\": \"large\", \"price\": 91.22, \"stock\": 8}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: chef knife. Dimensions: 34-inch. Color: yellow. Price: $59.12. Stock: 41.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"yellow\", \"size\": \"34-inch\", \"price\": 59.12, \"stock\": 41}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New gray espresso machine in medium. Retails for $230.09. 1 left in stock!",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"gray\", \"size\": \"medium\", \"price\": 230.09, \"stock\": 1}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "For sale: fitness tracker. Dimensions: medium. Color: orange. Price: $356.08. Stock: 37.",
+    "output": "{\"name\": \"fitness tracker\", \"category\": \"fitness\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 356.08, \"stock\": 37}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New white gaming monitor in large. Retails for $97.19. 20 left in stock!",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"white\", \"size\": \"large\", \"price\": 97.19, \"stock\": 20}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New gray espresso machine in compact. Retails for $386.47. 32 left in stock!",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"gray\", \"size\": \"compact\", \"price\": 386.47, \"stock\": 32}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: camping tent! Specifications: Color: gray, Size: medium, Price: $121.14, Quantity: 8 units.",
+    "output": "{\"name\": \"camping tent\", \"category\": \"outdoors\", \"color\": \"gray\", \"size\": \"medium\", \"price\": 121.14, \"stock\": 8}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Just added: cast iron skillet! Specifications: Color: black, Size: large, Price: $122.98, Quantity: 6 units.",
+    "output": "{\"name\": \"cast iron skillet\", \"category\": \"kitchen\", \"color\": \"black\", \"size\": \"large\", \"price\": 122.98, \"stock\": 6}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New blue gaming monitor in medium. Retails for $282.29. 57 left in stock!",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"blue\", \"size\": \"medium\", \"price\": 282.29, \"stock\": 57}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Hot deal: none mechanical keyboard (medium) is now $362.95. Hurry, only 6 remaining!",
+    "output": "{\"name\": \"mechanical keyboard\", \"category\": \"office\", \"color\": null, \"size\": \"medium\", \"price\": 362.95, \"stock\": 6}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling small white yoga mat for $335.39. Stock level: 22 items.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"white\", \"size\": \"small\", \"price\": 335.39, \"stock\": 22}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New silver backpack in large. Retails for $191.76. 73 left in stock!",
+    "output": "{\"name\": \"backpack\", \"category\": \"outdoors\", \"color\": \"silver\", \"size\": \"large\", \"price\": 191.76, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling medium green noise cancelling headphones for $191.07. Stock level: 73 items.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"green\", \"size\": \"medium\", \"price\": 191.07, \"stock\": 73}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling 12-inch blue yoga mat for $250.06. Stock level: 30 items.",
+    "output": "{\"name\": \"yoga mat\", \"category\": \"fitness\", \"color\": \"blue\", \"size\": \"12-inch\", \"price\": 250.06, \"stock\": 30}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new medium noise cancelling headphones in elegant orange finish. Retailing at $344.86 with 38 items in stock.",
+    "output": "{\"name\": \"noise cancelling headphones\", \"category\": \"office\", \"color\": \"orange\", \"size\": \"medium\", \"price\": 344.86, \"stock\": 38}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Brand new 34-inch camping stove in elegant black finish. Retailing at $95.43 with 49 items in stock.",
+    "output": "{\"name\": \"camping stove\", \"category\": \"outdoors\", \"color\": \"black\", \"size\": \"34-inch\", \"price\": 95.43, \"stock\": 49}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New yellow chef knife in 8-inch. Retails for $439.56. 49 left in stock!",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"yellow\", \"size\": \"8-inch\", \"price\": 439.56, \"stock\": 49}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling none orange gaming monitor for $331.82. Stock level: 15 items.",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"orange\", \"size\": null, \"price\": 331.82, \"stock\": 15}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling small silver chef knife for $217.92. Stock level: 4 items.",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"silver\", \"size\": \"small\", \"price\": 217.92, \"stock\": 4}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New black chef knife in none. Retails for $206.32. 74 left in stock!",
+    "output": "{\"name\": \"chef knife\", \"category\": \"kitchen\", \"color\": \"black\", \"size\": null, \"price\": 206.32, \"stock\": 74}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "Selling none blue espresso machine for $296.09. Stock level: 63 items.",
+    "output": "{\"name\": \"espresso machine\", \"category\": \"kitchen\", \"color\": \"blue\", \"size\": null, \"price\": 296.09, \"stock\": 63}"
+  },
+  {
+    "instruction": "Extract structured product attributes from the unstructured merchant description.",
+    "input": "New blue gaming monitor in medium. Retails for $184.07. 25 left in stock!",
+    "output": "{\"name\": \"gaming monitor\", \"category\": \"office\", \"color\": \"blue\", \"size\": \"medium\", \"price\": 184.07, \"stock\": 25}"
+  }
+]
