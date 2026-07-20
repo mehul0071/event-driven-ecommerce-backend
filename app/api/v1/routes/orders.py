@@ -17,7 +17,7 @@ async def place_order(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    return await create_order(db, order, background_tasks)
+    return await create_order(db, current_user.id, order, background_tasks)
 
 
 @router.get("/list-orders", response_model=List[OrderDetail])

@@ -10,6 +10,7 @@ from app.models.order import OrderModel, OrderDetailModel
 from app.models.product import ProductModel
 from app.schemas.order import OrderCreate, OrderDetail
 from app.events.order_events import OrderCreatedEvent
+from app.core.event_bus import event_bus
 
 
 async def handle_inventory(event: OrderCreatedEvent):
@@ -27,8 +28,8 @@ async def handle_notification(event: OrderCreatedEvent):
     print(f"[Notification] Sending confirmation for order {event.order_id}")
 
 
-async def create_order(db, order: OrderCreate, background_tasks):
-    new_order = OrderModel(status="created")
+async def create_order(db, user_id: UUID, order: OrderCreate, background_tasks):
+    new_order = OrderModel(user_id=user_id, status="created")
     db.add(new_order)
     await db.flush()
 
@@ -52,8 +53,7 @@ async def create_order(db, order: OrderCreate, background_tasks):
             order_id=new_order.id,
             product_id=item.product_id,
             quantity=item.quantity,
-            unit_price=product.price,
-            subtotal=subtotal
+            unit_price=product.price
         ))
 
     new_order.total_amount = total
@@ -61,10 +61,21 @@ async def create_order(db, order: OrderCreate, background_tasks):
     await db.commit()
     await db.refresh(new_order)
 
-    event = OrderCreatedEvent(order_id=new_order.id, occurred_at=datetime.utcnow())
-    background_tasks.add_task(handle_inventory, event)
-    background_tasks.add_task(handle_payment, event)
-    background_tasks.add_task(handle_notification, event)
+    event_data = {
+        "order_id": str(new_order.id),
+        "occurred_at": datetime.utcnow().isoformat()
+    }
+    
+    published = await event_bus.publish(
+        channel="order_events",
+        event_type="order_created",
+        data=event_data
+    )
+    if not published:
+        event = OrderCreatedEvent(order_id=new_order.id, occurred_at=datetime.utcnow())
+        background_tasks.add_task(handle_inventory, event)
+        background_tasks.add_task(handle_payment, event)
+        background_tasks.add_task(handle_notification, event)
 
     return {
         "order_id": new_order.id,
