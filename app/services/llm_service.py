@@ -2,13 +2,13 @@ import os
 import httpx
 import json
 import torch
+import re
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 from typing import List, Optional
 from app.models.product import ProductModel
 from app.schemas.chat import ChatBotResponse
 from langfuse import observe
-        import re
 
 
 class LLMService:

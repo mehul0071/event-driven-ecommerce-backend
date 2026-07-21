@@ -2,7 +2,7 @@ import asyncio
 import json
 import os
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 from dotenv import load_dotenv
 import redis.asyncio as aioredis
@@ -38,8 +38,10 @@ async def handle_product_created_or_updated(data):
                 print(f"[Worker] Successfully saved embedding for product {product_id} to database.")
             else:
                 print(f"[Worker] Warning: Product {product_id} not found in database.")
+                raise ValueError(f"Product {product_id} not found in database.")
     except Exception as e:
         print(f"[Worker] Error updating product embedding: {e}")
+        raise e
 
 async def handle_order_created(data):
     order_id_str = data.get("order_id")
@@ -61,6 +63,37 @@ async def handle_order_created(data):
         print(f"[Worker] Successfully processed order {order_id_str} tasks.")
     except Exception as e:
         print(f"[Worker] Error handling order created event: {e}")
+        raise e
+
+async def route_to_dlq(redis, event_type, payload, error_msg):
+    try:
+        dlq_entry = {
+            "event_type": event_type,
+            "payload": payload,
+            "error": error_msg,
+            "failed_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await redis.lpush("dlq_events", json.dumps(dlq_entry))
+        print(f"[Worker] Routed failed event {event_type} to DLQ.")
+    except Exception as e:
+        print(f"[Worker] Critical: Failed to route event to DLQ: {e}")
+
+async def process_with_retry(redis, handler, event_type, payload, max_retries=3, base_backoff=1.0):
+    attempt = 0
+    while True:
+        try:
+            await handler(payload.get("data", {}))
+            return
+        except Exception as e:
+            attempt += 1
+            if attempt > max_retries:
+                print(f"[Worker] Event {event_type} failed after {max_retries} attempts. Routing to DLQ...")
+                await route_to_dlq(redis, event_type, payload, str(e))
+                return
+            
+            backoff = base_backoff * (2 ** (attempt - 1))
+            print(f"[Worker] Error handling {event_type} (attempt {attempt}/{max_retries}): {e}. Retrying in {backoff}s...")
+            await asyncio.sleep(backoff)
 
 async def main():
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -80,13 +113,16 @@ async def main():
                 try:
                     payload = json.loads(message["data"])
                     event_type = payload.get("event_type")
-                    data = payload.get("data", {})
                     
                     print(f"[Worker] Received event: {event_type}")
                     if event_type in ("product_created", "product_updated"):
-                        asyncio.create_task(handle_product_created_or_updated(data))
+                        asyncio.create_task(
+                            process_with_retry(redis, handle_product_created_or_updated, event_type, payload)
+                        )
                     elif event_type == "order_created":
-                        asyncio.create_task(handle_order_created(data))
+                        asyncio.create_task(
+                            process_with_retry(redis, handle_order_created, event_type, payload)
+                        )
                 except Exception as ex:
                     print(f"[Worker] Error processing message: {ex}")
     except asyncio.CancelledError:
