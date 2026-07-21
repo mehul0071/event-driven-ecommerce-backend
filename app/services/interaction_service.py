@@ -5,6 +5,7 @@ from app.models.product import ProductModel
 from app.models.interaction import UserInteractionModel
 from app.schemas.interaction import UserInteractionCreate
 
+
 async def log_user_interaction(
     db: AsyncSession,
     user_id: UUID,

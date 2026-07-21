@@ -12,7 +12,7 @@ from app.models.product import ProductModel
 from app.models.user import UserModel
 from app.services.embedding_service import embedding_service
 from app.events.order_events import OrderCreatedEvent
-from app.services.order_service import handle_inventory, handle_payment, handle_notification
+from app.services.order_service import handle_inventory, handle_payment, handle_notification, update_order_status
 
 
 load_dotenv()
@@ -55,14 +55,25 @@ async def handle_order_created(data):
         occurred_at = datetime.fromisoformat(occurred_at_str) if occurred_at_str else datetime.utcnow()
         event = OrderCreatedEvent(order_id=order_id, occurred_at=occurred_at)
         
+        # Transition to processing state
+        await update_order_status(order_id, "processing")
+        
         await asyncio.gather(
             handle_inventory(event),
             handle_payment(event),
             handle_notification(event)
         )
+        
+        # Transition to completed state
+        await update_order_status(order_id, "completed")
         print(f"[Worker] Successfully processed order {order_id_str} tasks.")
     except Exception as e:
         print(f"[Worker] Error handling order created event: {e}")
+        if order_id_str:
+            try:
+                await update_order_status(UUID(order_id_str), "failed")
+            except Exception as update_ex:
+                print(f"[Worker] Failed to update order status to failed: {update_ex}")
         raise e
 
 async def route_to_dlq(redis, event_type, payload, error_msg):

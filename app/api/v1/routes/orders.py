@@ -25,7 +25,7 @@ async def order_details(
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    return await list_of_order_details(db)
+    return await list_of_order_details(db, current_user.id, current_user.is_superuser)
 
 
 @router.get("/list-order/{order_id}", response_model=List[OrderDetail])
@@ -34,7 +34,7 @@ async def order_detail(
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    return await order_detail_by_id(db, order_id)
+    return await order_detail_by_id(db, order_id, current_user.id, current_user.is_superuser)
 
 
 @router.delete("/delete-order/{order_id}", status_code=204)
@@ -43,4 +43,4 @@ async def delete_order(
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    return await delete_order_by_id(db, order_id)
+    return await delete_order_by_id(db, order_id, current_user.id, current_user.is_superuser)
