@@ -97,3 +97,5 @@ async def test_semantic_search_flow():
         except asyncio.CancelledError:
             pass
         await event_bus.close()
+        from app.core.database import engine
+        await engine.dispose()

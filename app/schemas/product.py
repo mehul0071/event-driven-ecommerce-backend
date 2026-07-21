@@ -38,3 +38,7 @@ class ProductUpdate(BaseModel):
 
 #     class Config:
 #         from_attributes = True
+
+
+class DescriptionRequest(BaseModel):
+    description: str

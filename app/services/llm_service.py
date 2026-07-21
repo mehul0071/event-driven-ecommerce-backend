@@ -1,10 +1,15 @@
 import os
 import httpx
 import json
-from typing import List
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+from typing import List, Optional
 from app.models.product import ProductModel
 from app.schemas.chat import ChatBotResponse
 from langfuse import observe
+        import re
+
 
 class LLMService:
     def __init__(self):
@@ -13,6 +18,11 @@ class LLMService:
         self.hf_model = os.getenv("HF_LLM_MODEL", "mistralai/Mistral-7B-Instruct-v0.2")
         self.groq_key = os.getenv("GROQ_API_KEY")
         self.groq_model = os.getenv("GROQ_LLM_MODEL", "llama-3.1-8b-instant")
+        self.adapter_path = "./fine_tuned_parser"
+        self.base_model_id = "meta-llama/Meta-Llama-3-8B"
+        self._model = None
+        self._tokenizer = None
+        self._model_loaded = False
 
     @observe(as_type="generation")
     async def generate_rag_response(self, query: str, products: List[ProductModel]) -> ChatBotResponse:
@@ -169,5 +179,173 @@ class LLMService:
             recommended_product_ids=recommended_ids,
             follow_up_questions=["What is the shipping cost?", "Are there discounts for bulk purchases?"]
         )
+
+    def _load_local_peft_model(self) -> bool:
+        if self._model_loaded:
+            return True
+        if not os.path.exists(self.adapter_path):
+            print(f"[LLMService] Local adapter path {self.adapter_path} not found. Fallback to API/mock parser.")
+            return False
+        
+        try:
+            
+            print(f"[LLMService] Loading local fine-tuned parser from {self.adapter_path}...")
+            device_map = "auto" if torch.cuda.is_available() else "cpu"
+            torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+            
+            self._tokenizer = AutoTokenizer.from_pretrained(self.base_model_id)
+            base_model = AutoModelForCausalLM.from_pretrained(
+                self.base_model_id,
+                torch_dtype=torch_dtype,
+                device_map=device_map
+            )
+            self._model = PeftModel.from_pretrained(base_model, self.adapter_path)
+            self._model.eval()
+            self._model_loaded = True
+            print("[LLMService] Local fine-tuned parser model loaded successfully.")
+            return True
+        except Exception as e:
+            print(f"[LLMService] Failed to load local PEFT model: {e}")
+            return False
+
+    async def parse_product_description(self, description: str) -> dict:
+        instruction = "Extract structured product attributes from the unstructured merchant description."
+        prompt = f"System: {instruction}\nUser: {description}\nAssistant: "
+        
+        if self._load_local_peft_model():
+            try:
+                import torch
+                inputs = self._tokenizer(prompt, return_tensors="pt")
+                if torch.cuda.is_available():
+                    inputs = {k: v.cuda() for k, v in inputs.items()}
+                
+                with torch.no_grad():
+                    outputs = self._model.generate(
+                        **inputs,
+                        max_new_tokens=150,
+                        temperature=0.1,
+                        do_sample=False
+                    )
+                
+                generated_text = self._tokenizer.decode(outputs[0], skip_special_tokens=True)
+                response_part = generated_text[len(prompt):].strip()
+                parsed_json = json.loads(response_part)
+                return parsed_json
+            except Exception as e:
+                print(f"[LLMService] Local PEFT inference failed: {e}. Falling back...")
+
+        if self.groq_key and not self.groq_key.startswith("gsk_mock"):
+            try:
+                import groq
+                import instructor
+                from pydantic import BaseModel
+                
+                class ProductAttributes(BaseModel):
+                    name: str
+                    category: str
+                    color: Optional[str] = None
+                    size: Optional[str] = None
+                    price: float
+                    stock: int
+                
+                g_client = groq.Groq(api_key=self.groq_key)
+                instr_client = instructor.from_groq(g_client)
+                
+                response_obj = instr_client.chat.completions.create(
+                    model=self.groq_model,
+                    response_model=ProductAttributes,
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": description}
+                    ],
+                    temperature=0.1,
+                )
+                return response_obj.model_dump()
+            except Exception as e:
+                print(f"[LLMService] Groq API fallback for parser failed: {e}")
+
+        if self.openai_key:
+            try:
+                import openai
+                import instructor
+                from pydantic import BaseModel
+                
+                class ProductAttributes(BaseModel):
+                    name: str
+                    category: str
+                    color: Optional[str] = None
+                    size: Optional[str] = None
+                    price: float
+                    stock: int
+                
+                oai_client = openai.AsyncOpenAI(api_key=self.openai_key)
+                instr_client = instructor.from_openai(oai_client)
+                
+                response_obj = await instr_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    response_model=ProductAttributes,
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": description}
+                    ],
+                    temperature=0.1,
+                )
+                return response_obj.model_dump()
+            except Exception as e:
+                print(f"[LLMService] OpenAI API fallback for parser failed: {e}")
+
+        return self._fallback_rule_based_parser(description)
+
+    def _fallback_rule_based_parser(self, description: str) -> dict:
+        desc_lower = description.lower()
+        
+        price = 0.0
+        price_match = re.search(r'\$\s*([0-9]+(?:\.[0-9]+)?)', description)
+        if price_match:
+            price = float(price_match.group(1))
+            
+        stock = 0
+        stock_match = re.search(r'([0-9]+)\s*(?:left in stock|available|units|items|left)', desc_lower)
+        if stock_match:
+            stock = int(stock_match.group(1))
+            
+        color = None
+        for c in ["red", "blue", "green", "yellow", "black", "white", "orange", "gray"]:
+            if c in desc_lower:
+                color = c
+                break
+                
+        size = None
+        size_match = re.search(r'([0-9]+-inch|small|medium|large|standard|compact)', desc_lower)
+        if size_match:
+            size = size_match.group(1)
+            
+        category = "general"
+        for cat, keywords in {
+            "outdoors": ["backpack", "stove", "sleeping bag", "camping", "tent"],
+            "fitness": ["dumbbell", "weights", "fitness", "tracker"],
+            "kitchen": ["knife", "skillet", "chef", "espresso"],
+            "office": ["keyboard", "headphones", "monitor", "noise cancelling"]
+        }.items():
+            if any(k in desc_lower for k in keywords):
+                category = cat
+                break
+                
+        name = "unknown product"
+        for kw in ["backpack", "camping stove", "dumbbell set", "mechanical keyboard", 
+                   "noise cancelling headphones", "espresso machine", "gaming monitor", 
+                   "chef knife", "cast iron skillet", "sleeping bag"]:
+            if kw in desc_lower:
+                name = kw
+                break
+                
+        return {
+            "name": name,
+            "category": category,
+            "color": color,
+            "size": size,
+            "price": price,
+            "stock": stock
+        }
 
 llm_service = LLMService()

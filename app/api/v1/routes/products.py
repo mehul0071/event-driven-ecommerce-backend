@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.routes.auth import get_current_user
 from app.core.database import get_db
-from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate, DescriptionRequest
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.product_service import create_product, delete_product_by_id, list_of_products, list_product_endpoint_by_id, update_product_by_id, semantic_search_products
 from app.services.llm_service import llm_service
@@ -113,3 +113,29 @@ async def recommend_products(
     db: AsyncSession = Depends(get_db)
 ):
     return await get_hybrid_recommendations(db, current_user.id, limit)
+
+
+@router.post("/parse-description")
+async def parse_product_description_endpoint(
+    description_request: DescriptionRequest,
+    current_user = Depends(get_current_user)
+):
+    parsed_attributes = await llm_service.parse_product_description(description_request.description)
+    return parsed_attributes
+
+
+@router.post("/parse-and-create-product", response_model=ProductResponse)
+async def parse_and_create_product_endpoint(
+    description_request: DescriptionRequest,
+    background_tasks: BackgroundTasks,
+    current_user = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    parsed = await llm_service.parse_product_description(description_request.description)
+    product_create = ProductCreate(
+        name=parsed.get("name") or "parsed-product",
+        description=f"Color: {parsed.get('color')}, Size: {parsed.get('size')}, Category: {parsed.get('category')}",
+        price=float(parsed.get("price") or 0.0),
+        stock=int(parsed.get("stock") or 0)
+    )
+    return await create_product(db, product_create, background_tasks)
