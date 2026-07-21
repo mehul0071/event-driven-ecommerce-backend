@@ -3,16 +3,23 @@ from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.database import AsyncSessionLocal
 from app.models.product import ProductModel
+from app.models.user import UserModel
+from app.models.order import OrderModel, OrderDetailModel
+from app.models.interaction import UserInteractionModel
+from app.models.review import ReviewModel
 from sqlalchemy import delete
 import asyncio
-
-from app.models.user import UserModel
 from app.core.event_bus import event_bus
 from worker import main as worker_main
+
 
 @pytest.mark.asyncio
 async def test_semantic_search_flow():
     async with AsyncSessionLocal() as session:
+        await session.execute(delete(UserInteractionModel))
+        await session.execute(delete(OrderDetailModel))
+        await session.execute(delete(ReviewModel))
+        await session.execute(delete(OrderModel))
         await session.execute(delete(ProductModel))
         await session.execute(delete(UserModel))
         await session.commit()

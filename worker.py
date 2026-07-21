@@ -10,7 +10,10 @@ from sqlalchemy import select
 from app.core.database import AsyncSessionLocal, engine
 from app.models.product import ProductModel
 from app.models.user import UserModel
+from app.models.review import ReviewModel
+from app.models.interaction import UserInteractionModel
 from app.services.embedding_service import embedding_service
+from app.services.llm_service import llm_service
 from app.events.order_events import OrderCreatedEvent
 from app.services.order_service import handle_inventory, handle_payment, handle_notification, update_order_status
 
@@ -55,7 +58,6 @@ async def handle_order_created(data):
         occurred_at = datetime.fromisoformat(occurred_at_str) if occurred_at_str else datetime.utcnow()
         event = OrderCreatedEvent(order_id=order_id, occurred_at=occurred_at)
         
-        # Transition to processing state
         await update_order_status(order_id, "processing")
         
         await asyncio.gather(
@@ -64,7 +66,6 @@ async def handle_order_created(data):
             handle_notification(event)
         )
         
-        # Transition to completed state
         await update_order_status(order_id, "completed")
         print(f"[Worker] Successfully processed order {order_id_str} tasks.")
     except Exception as e:
@@ -74,6 +75,61 @@ async def handle_order_created(data):
                 await update_order_status(UUID(order_id_str), "failed")
             except Exception as update_ex:
                 print(f"[Worker] Failed to update order status to failed: {update_ex}")
+        raise e
+
+
+async def handle_review_created(data):
+    review_id_str = data.get("review_id")
+    product_id_str = data.get("product_id")
+    user_id_str = data.get("user_id")
+    comment = data.get("comment", "")
+    rating = data.get("rating", 3)
+
+    if not review_id_str or not product_id_str or not user_id_str:
+        return
+
+    print(f"[Worker] Processing review event for review: {review_id_str}")
+    try:
+        review_id = UUID(review_id_str)
+        product_id = UUID(product_id_str)
+        user_id = UUID(user_id_str)
+
+        embedding = None
+        if comment:
+            embedding = await embedding_service.generate_embedding(comment)
+
+        sentiment = "neutral"
+        summary_tags = ""
+        if comment:
+            analysis = await llm_service.analyze_review_sentiment_and_tags(comment)
+            sentiment = analysis.get("sentiment", "neutral")
+            tags = analysis.get("summary_tags", [])
+            summary_tags = ", ".join(tags)
+
+        async with AsyncSessionLocal() as db:
+            stmt = select(ReviewModel).where(ReviewModel.id == review_id)
+            result = await db.execute(stmt)
+            review = result.scalar_one_or_none()
+            
+            if review:
+                review.embedding = embedding
+                review.sentiment = sentiment
+                review.summary_tags = summary_tags
+                
+                if rating >= 4:
+                    interaction = UserInteractionModel(
+                        user_id=user_id,
+                        product_id=product_id,
+                        interaction_type="review_positive"
+                    )
+                    db.add(interaction)
+                
+                await db.commit()
+                print(f"[Worker] Successfully updated review analysis for {review_id_str}")
+            else:
+                print(f"[Worker] Review {review_id_str} not found in database.")
+    except Exception as e:
+        print(f"[Worker] Error handling review created event: {e}")
         raise e
 
 async def route_to_dlq(redis, event_type, payload, error_msg):
@@ -112,8 +168,8 @@ async def main():
     try:
         redis = aioredis.from_url(redis_url, decode_responses=True)
         pubsub = redis.pubsub()
-        await pubsub.subscribe("product_events", "order_events")
-        print("[Worker] Subscribed to 'product_events' and 'order_events' channels. Listening for events...")
+        await pubsub.subscribe("product_events", "order_events", "review_events")
+        print("[Worker] Subscribed to 'product_events', 'order_events', and 'review_events' channels. Listening for events...")
     except Exception as e:
         print(f"[Worker] Failed to initialize Redis subscriber: {e}")
         return
@@ -134,12 +190,16 @@ async def main():
                         asyncio.create_task(
                             process_with_retry(redis, handle_order_created, event_type, payload)
                         )
+                    elif event_type == "review_created":
+                        asyncio.create_task(
+                            process_with_retry(redis, handle_review_created, event_type, payload)
+                        )
                 except Exception as ex:
                     print(f"[Worker] Error processing message: {ex}")
     except asyncio.CancelledError:
         print("[Worker] Shutting down...")
     finally:
-        await pubsub.unsubscribe("product_events", "order_events")
+        await pubsub.unsubscribe("product_events", "order_events", "review_events")
         await redis.close()
         await engine.dispose()
 

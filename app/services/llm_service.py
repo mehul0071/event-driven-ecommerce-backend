@@ -8,7 +8,11 @@ from peft import PeftModel
 from typing import List, Optional
 from app.models.product import ProductModel
 from app.schemas.chat import ChatBotResponse
+from app.schemas.review import ReviewAnalysis, ReviewsConsensus
 from langfuse import observe
+import groq
+import instructor
+import openai
 
 
 class LLMService:
@@ -236,18 +240,6 @@ class LLMService:
 
         if self.groq_key and not self.groq_key.startswith("gsk_mock"):
             try:
-                import groq
-                import instructor
-                from pydantic import BaseModel
-                
-                class ProductAttributes(BaseModel):
-                    name: str
-                    category: str
-                    color: Optional[str] = None
-                    size: Optional[str] = None
-                    price: float
-                    stock: int
-                
                 g_client = groq.Groq(api_key=self.groq_key)
                 instr_client = instructor.from_groq(g_client)
                 
@@ -266,18 +258,6 @@ class LLMService:
 
         if self.openai_key:
             try:
-                import openai
-                import instructor
-                from pydantic import BaseModel
-                
-                class ProductAttributes(BaseModel):
-                    name: str
-                    category: str
-                    color: Optional[str] = None
-                    size: Optional[str] = None
-                    price: float
-                    stock: int
-                
                 oai_client = openai.AsyncOpenAI(api_key=self.openai_key)
                 instr_client = instructor.from_openai(oai_client)
                 
@@ -347,5 +327,178 @@ class LLMService:
             "price": price,
             "stock": stock
         }
+
+    @observe(as_type="generation")
+    async def analyze_review_sentiment_and_tags(self, comment: str) -> dict:
+        instruction = "Classify the sentiment and extract key descriptive aspects (tags) from the user's product review."
+
+        response_obj = None
+
+        if self.groq_key and not self.groq_key.startswith("gsk_mock"):
+            try:
+                
+                g_client = groq.Groq(api_key=self.groq_key)
+                instr_client = instructor.from_groq(g_client)
+                
+                response_obj = instr_client.chat.completions.create(
+                    model=self.groq_model,
+                    response_model=ReviewAnalysis,
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": comment}
+                    ],
+                    temperature=0.1
+                )
+            except Exception as e:
+                print(f"[LLMService] Groq sentiment analysis failed: {e}")
+
+        if not response_obj and self.openai_key:
+            try:
+                oai_client = openai.AsyncOpenAI(api_key=self.openai_key)
+                instr_client = instructor.from_openai(oai_client)
+                
+                response_obj = await instr_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    response_model=ReviewAnalysis,
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": comment}
+                    ],
+                    temperature=0.1
+                )
+            except Exception as e:
+                print(f"[LLMService] OpenAI sentiment analysis failed: {e}")
+
+        if response_obj:
+            return response_obj.model_dump()
+
+        return self._fallback_sentiment_parser(comment)
+
+    def _fallback_sentiment_parser(self, comment: str) -> dict:
+        c_lower = comment.lower()
+        
+        positive_kws = ["good", "great", "excellent", "love", "awesome", "perfect", "durable", "amazing", "best"]
+        negative_kws = ["bad", "poor", "terrible", "hate", "worst", "broke", "disappointed", "stiff", "tight"]
+        
+        pos_count = sum(1 for kw in positive_kws if kw in c_lower)
+        neg_count = sum(1 for kw in negative_kws if kw in c_lower)
+        
+        if pos_count > neg_count:
+            sentiment = "positive"
+        elif neg_count > pos_count:
+            sentiment = "negative"
+        else:
+            sentiment = "neutral"
+            
+        tags = []
+        for kw in ["durable", "stiff", "lightweight", "heavy", "warm", "waterproof", "comfy", "comfortable", "noisy"]:
+            if kw in c_lower:
+                tags.append(kw)
+        if not tags:
+            tags = ["general"]
+            
+        return {
+            "sentiment": sentiment,
+            "summary_tags": tags[:3]
+        }
+
+    @observe(as_type="generation")
+    async def generate_reviews_summary(self, product_name: str, reviews: List[dict]) -> dict:
+        if not reviews:
+            return {
+                "pros": ["No reviews available"],
+                "cons": ["No reviews available"],
+                "verdict": f"No reviews have been written for {product_name} yet."
+            }
+            
+        context_items = []
+        for r in reviews:
+            comment = r.get("comment") or "No comment"
+            rating = r.get("rating", 3)
+            context_items.append(f"- Rating: {rating}/5 stars\n  Review: {comment}")
+        context = "\n\n".join(context_items)
+
+        system_prompt = (
+            f"You are an expert product analyst summarizing customer feedback for the product: {product_name}.\n"
+            "Your goal is to output a structured consensus summary containing pros, cons, and a final verdict based ONLY on the provided reviews context.\n"
+            "If no reviews exist or context is empty, return simple placeholders."
+        )
+
+        response_obj = None
+
+        if self.groq_key and not self.groq_key.startswith("gsk_mock"):
+            try:
+                g_client = groq.Groq(api_key=self.groq_key)
+                instr_client = instructor.from_groq(g_client)
+                
+                response_obj = instr_client.chat.completions.create(
+                    model=self.groq_model,
+                    response_model=ReviewsConsensus,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"=== REVIEWS ===\n{context}"}
+                    ],
+                    temperature=0.2
+                )
+            except Exception as e:
+                print(f"[LLMService] Groq consensus summary failed: {e}")
+
+        if not response_obj and self.openai_key:
+            try:
+                oai_client = openai.AsyncOpenAI(api_key=self.openai_key)
+                instr_client = instructor.from_openai(oai_client)
+                
+                response_obj = await instr_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    response_model=ReviewsConsensus,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"=== REVIEWS ===\n{context}"}
+                    ],
+                    temperature=0.2
+                )
+            except Exception as e:
+                print(f"[LLMService] OpenAI consensus summary failed: {e}")
+
+        if response_obj:
+            return response_obj.model_dump()
+
+        return self._fallback_reviews_summarizer(product_name, reviews)
+
+    def _fallback_reviews_summarizer(self, product_name: str, reviews: List[dict]) -> dict:
+        pros = []
+        cons = []
+        
+        for r in reviews:
+            comment_lower = (r.get("comment") or "").lower()
+            rating = r.get("rating", 3)
+            
+            if rating >= 4:
+                if "durable" in comment_lower or "quality" in comment_lower:
+                    pros.append("Durable and high quality")
+                if "comfortable" in comment_lower or "comfy" in comment_lower:
+                    pros.append("Comfortable design")
+                if "lightweight" in comment_lower:
+                    pros.append("Lightweight construction")
+            elif rating <= 2:
+                if "stiff" in comment_lower or "hard" in comment_lower:
+                    cons.append("Some stiffness reported")
+                if "tight" in comment_lower or "small" in comment_lower:
+                    cons.append("Sizing can feel tight")
+                if "broke" in comment_lower or "poor" in comment_lower:
+                    cons.append("Durability issues reported")
+                    
+        pros = list(set(pros)) if pros else ["Good features overall"]
+        cons = list(set(cons)) if cons else ["No major complaints"]
+        
+        avg_rating = sum(r.get("rating", 3) for r in reviews) / len(reviews)
+        verdict = f"A solid choice for {product_name} with an average rating of {avg_rating:.1f}/5 stars."
+        
+        return {
+            "pros": pros[:3],
+            "cons": cons[:3],
+            "verdict": verdict
+        }
+
 
 llm_service = LLMService()
