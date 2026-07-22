@@ -13,6 +13,8 @@ from langfuse import observe
 import groq
 import instructor
 import openai
+import logging
+logger = logging.getLogger(__name__)
 
 
 class LLMService:
@@ -76,7 +78,7 @@ class LLMService:
                 )
                 model_name = self.groq_model
             except Exception as e:
-                print(f"[LLMService] Groq Instructor request failed: {e}")
+                logger.info(f"[LLMService] Groq Instructor request failed: {e}")
 
         if not response_obj and self.openai_key:
             try:
@@ -98,7 +100,7 @@ class LLMService:
                 )
                 model_name = "gpt-4o-mini"
             except Exception as e:
-                print(f"[LLMService] OpenAI Instructor request failed: {e}")
+                logger.info(f"[LLMService] OpenAI Instructor request failed: {e}")
 
         if not response_obj and self.hf_token:
             try:
@@ -123,7 +125,7 @@ class LLMService:
                             )
                             model_name = self.hf_model
             except Exception as e:
-                print(f"[LLMService] HuggingFace Chat request failed: {e}")
+                logger.info(f"[LLMService] HuggingFace Chat request failed: {e}")
 
         if not response_obj:
             response_obj = self._generate_mock_rag_response(query, products)
@@ -188,12 +190,12 @@ class LLMService:
         if self._model_loaded:
             return True
         if not os.path.exists(self.adapter_path):
-            print(f"[LLMService] Local adapter path {self.adapter_path} not found. Fallback to API/mock parser.")
+            logger.info(f"[LLMService] Local adapter path {self.adapter_path} not found. Fallback to API/mock parser.")
             return False
         
         try:
             
-            print(f"[LLMService] Loading local fine-tuned parser from {self.adapter_path}...")
+            logger.info(f"[LLMService] Loading local fine-tuned parser from {self.adapter_path}...")
             device_map = "auto" if torch.cuda.is_available() else "cpu"
             torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
             
@@ -206,10 +208,10 @@ class LLMService:
             self._model = PeftModel.from_pretrained(base_model, self.adapter_path)
             self._model.eval()
             self._model_loaded = True
-            print("[LLMService] Local fine-tuned parser model loaded successfully.")
+            logger.info("[LLMService] Local fine-tuned parser model loaded successfully.")
             return True
         except Exception as e:
-            print(f"[LLMService] Failed to load local PEFT model: {e}")
+            logger.info(f"[LLMService] Failed to load local PEFT model: {e}")
             return False
 
     async def parse_product_description(self, description: str) -> dict:
@@ -236,7 +238,7 @@ class LLMService:
                 parsed_json = json.loads(response_part)
                 return parsed_json
             except Exception as e:
-                print(f"[LLMService] Local PEFT inference failed: {e}. Falling back...")
+                logger.info(f"[LLMService] Local PEFT inference failed: {e}. Falling back...")
 
         if self.groq_key and not self.groq_key.startswith("gsk_mock"):
             try:
@@ -254,7 +256,7 @@ class LLMService:
                 )
                 return response_obj.model_dump()
             except Exception as e:
-                print(f"[LLMService] Groq API fallback for parser failed: {e}")
+                logger.info(f"[LLMService] Groq API fallback for parser failed: {e}")
 
         if self.openai_key:
             try:
@@ -272,7 +274,7 @@ class LLMService:
                 )
                 return response_obj.model_dump()
             except Exception as e:
-                print(f"[LLMService] OpenAI API fallback for parser failed: {e}")
+                logger.info(f"[LLMService] OpenAI API fallback for parser failed: {e}")
 
         return self._fallback_rule_based_parser(description)
 
@@ -350,7 +352,7 @@ class LLMService:
                     temperature=0.1
                 )
             except Exception as e:
-                print(f"[LLMService] Groq sentiment analysis failed: {e}")
+                logger.info(f"[LLMService] Groq sentiment analysis failed: {e}")
 
         if not response_obj and self.openai_key:
             try:
@@ -367,7 +369,7 @@ class LLMService:
                     temperature=0.1
                 )
             except Exception as e:
-                print(f"[LLMService] OpenAI sentiment analysis failed: {e}")
+                logger.info(f"[LLMService] OpenAI sentiment analysis failed: {e}")
 
         if response_obj:
             return response_obj.model_dump()
@@ -441,7 +443,7 @@ class LLMService:
                     temperature=0.2
                 )
             except Exception as e:
-                print(f"[LLMService] Groq consensus summary failed: {e}")
+                logger.info(f"[LLMService] Groq consensus summary failed: {e}")
 
         if not response_obj and self.openai_key:
             try:
@@ -458,7 +460,7 @@ class LLMService:
                     temperature=0.2
                 )
             except Exception as e:
-                print(f"[LLMService] OpenAI consensus summary failed: {e}")
+                logger.info(f"[LLMService] OpenAI consensus summary failed: {e}")
 
         if response_obj:
             return response_obj.model_dump()

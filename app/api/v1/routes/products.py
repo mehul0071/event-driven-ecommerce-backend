@@ -1,7 +1,8 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.limiter import limiter
 from app.api.v1.routes.auth import get_current_user
 from app.core.database import get_db
 from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate, DescriptionRequest
@@ -63,7 +64,9 @@ async def delete_product(
 
 
 @router.get("/search", response_model=List[ProductResponse])
+@limiter.limit("10/minute")
 async def search_products(
+    request: Request,
     query: str,
     limit: int = 5,
     db: AsyncSession = Depends(get_db)
@@ -73,7 +76,9 @@ async def search_products(
 
 @router.post("/chat", response_model=ChatResponse)
 @observe(name="chat_with_catalog")
+@limiter.limit("10/minute")
 async def chat_with_catalog(
+    request: Request,
     chat_request: ChatRequest,
     db: AsyncSession = Depends(get_db)
 ):
@@ -116,7 +121,9 @@ async def recommend_products(
 
 
 @router.post("/parse-description")
+@limiter.limit("10/minute")
 async def parse_product_description_endpoint(
+    request: Request,
     description_request: DescriptionRequest,
     current_user = Depends(get_current_user)
 ):

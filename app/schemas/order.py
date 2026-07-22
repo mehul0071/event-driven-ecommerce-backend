@@ -12,6 +12,12 @@ class OrderCreate(BaseModel):
     items: List[OrderItem]
 
 
+class OrderResponse(BaseModel):
+    order_id: UUID
+    status: str
+    total_amount: float
+
+
 class OrderDetail(BaseModel):
     order_id: UUID
     product_id: UUID

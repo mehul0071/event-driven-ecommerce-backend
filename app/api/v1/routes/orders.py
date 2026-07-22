@@ -3,14 +3,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.routes.auth import get_current_user
-from app.schemas.order import OrderCreate, OrderDetail
+from app.schemas.order import OrderCreate, OrderDetail, OrderResponse
 from app.services.order_service import create_order, delete_order_by_id, list_of_order_details, order_detail_by_id
 from app.core.database import get_db
 
 router = APIRouter()
 
 
-@router.post("/place-order")
+@router.post("/place-order", response_model=OrderResponse)
 async def place_order(
     order: OrderCreate,
     background_tasks: BackgroundTasks,

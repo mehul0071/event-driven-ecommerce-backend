@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -16,6 +17,8 @@ class ProductResponse(BaseModel):
     description: Optional[str] = None
     price: float
     stock: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -22,6 +22,10 @@ async def log_user_interaction(
     return db_interaction
 
 
+# TODO (Taste Vector Improvements):
+# Current approach: simple average of last N embeddings
+# Known limitation: recency-blind, all interaction types equally weighted
+# Next step: weighted average with exponential decay + interaction-type weights (view < cart < purchase < positive_review)
 async def compute_user_taste_vector(
     db: AsyncSession,
     user_id: UUID,

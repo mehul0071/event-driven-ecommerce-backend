@@ -11,21 +11,23 @@ from app.schemas.order import OrderCreate, OrderDetail
 from app.events.order_events import OrderCreatedEvent
 from app.core.event_bus import event_bus
 from app.core.database import AsyncSessionLocal
+import logging
+logger = logging.getLogger(__name__)
 
 
 async def handle_inventory(event: OrderCreatedEvent):
     await asyncio.sleep(2)
-    print(f"[Inventory] Reserving stock for order {event.order_id}")
+    logger.info(f"[Inventory] Reserving stock for order {event.order_id}")
 
 
 async def handle_payment(event: OrderCreatedEvent):
     await asyncio.sleep(3)
-    print(f"[Payment] Processing payment for order {event.order_id}")
+    logger.info(f"[Payment] Processing payment for order {event.order_id}")
 
 
 async def handle_notification(event: OrderCreatedEvent):
     await asyncio.sleep(1)
-    print(f"[Notification] Sending confirmation for order {event.order_id}")
+    logger.info(f"[Notification] Sending confirmation for order {event.order_id}")
 
 
 async def update_order_status(order_id: UUID, status: str):
@@ -36,7 +38,7 @@ async def update_order_status(order_id: UUID, status: str):
         if order:
             order.status = status
             await db.commit()
-            print(f"[Order Service] Order {order_id} status updated to: {status}")
+            logger.info(f"[Order Service] Order {order_id} status updated to: {status}")
 
 
 async def process_order_fallback(event: OrderCreatedEvent):
@@ -49,7 +51,7 @@ async def process_order_fallback(event: OrderCreatedEvent):
         )
         await update_order_status(event.order_id, "completed")
     except Exception as e:
-        print(f"[Fallback] Error processing order {event.order_id}: {e}")
+        logger.info(f"[Fallback] Error processing order {event.order_id}: {e}")
         await update_order_status(event.order_id, "failed")
 
 

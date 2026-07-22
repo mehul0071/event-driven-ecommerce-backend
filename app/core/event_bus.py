@@ -4,6 +4,8 @@ import asyncio
 from typing import Any, Dict
 from dotenv import load_dotenv
 import redis.asyncio as aioredis
+import logging
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -15,15 +17,15 @@ class EventBus:
 
     async def connect(self):
         if not self.redis_url:
-            print("[EventBus] REDIS_URL not configured. Running in fallback (in-memory) mode.")
+            logger.info("[EventBus] REDIS_URL not configured. Running in fallback (in-memory) mode.")
             return
         try:
             self.redis = aioredis.from_url(self.redis_url, decode_responses=True)
             await self.redis.ping()
             self._connected = True
-            print("[EventBus] Successfully connected to Redis event broker.")
+            logger.info("[EventBus] Successfully connected to Redis event broker.")
         except Exception as e:
-            print(f"[EventBus] Failed to connect to Redis: {e}. Running in fallback (in-memory) mode.")
+            logger.info(f"[EventBus] Failed to connect to Redis: {e}. Running in fallback (in-memory) mode.")
             self._connected = False
 
     async def publish(self, channel: str, event_type: str, data: Dict[str, Any]):
@@ -36,13 +38,13 @@ class EventBus:
         if self._connected and self.redis:
             try:
                 await self.redis.publish(channel, message_str)
-                print(f"[EventBus] Published {event_type} event to Redis channel '{channel}'")
+                logger.info(f"[EventBus] Published {event_type} event to Redis channel '{channel}'")
                 return True
             except Exception as e:
-                print(f"[EventBus] Failed to publish event to Redis: {e}")
+                logger.info(f"[EventBus] Failed to publish event to Redis: {e}")
         
         # Fallback to local warning (FastAPI BackgroundTasks will execute in-process)
-        print(f"[EventBus] Fallback: Logged event {event_type} in-memory")
+        logger.info(f"[EventBus] Fallback: Logged event {event_type} in-memory")
         return False
 
     async def close(self):

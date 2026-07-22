@@ -22,3 +22,5 @@ datasets
 peft
 trl
 mlflow
+slowapi
+python-json-logger

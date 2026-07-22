@@ -3,6 +3,8 @@ import random
 import os
 import httpx
 from typing import List
+import logging
+logger = logging.getLogger(__name__)
 
 class EmbeddingService:
     def __init__(self):
@@ -13,9 +15,9 @@ class EmbeddingService:
         try:
             from sentence_transformers import SentenceTransformer
             self.local_model = SentenceTransformer(self.hf_model)
-            print(f"[EmbeddingService] Successfully loaded local SentenceTransformer model '{self.hf_model}'")
+            logger.info(f"[EmbeddingService] Successfully loaded local SentenceTransformer model '{self.hf_model}'")
         except Exception as e:
-            print(f"[EmbeddingService] Warning: Failed to load local SentenceTransformer: {e}. Will fall back to HF API / mock.")
+            logger.info(f"[EmbeddingService] Warning: Failed to load local SentenceTransformer: {e}. Will fall back to HF API / mock.")
 
     async def generate_embedding(self, text: str) -> List[float]:
         if not text or not text.strip():
@@ -26,7 +28,7 @@ class EmbeddingService:
                 embedding = self.local_model.encode(text)
                 return [float(x) for x in embedding]
             except Exception as e:
-                print(f"[EmbeddingService] Local encoding failed: {e}. Trying API fallback...")
+                logger.info(f"[EmbeddingService] Local encoding failed: {e}. Trying API fallback...")
 
         try:
             headers = {}
@@ -48,11 +50,11 @@ class EmbeddingService:
                             embedding = embedding[0]
                         if len(embedding) == self.dimension:
                             return [float(x) for x in embedding]
-                    print(f"[EmbeddingService] Warning: Received unexpected output shape from HF API: {len(embedding)}")
+                    logger.info(f"[EmbeddingService] Warning: Received unexpected output shape from HF API: {len(embedding)}")
                 else:
-                    print(f"[EmbeddingService] HF API returned status code {response.status_code}: {response.text}")
+                    logger.info(f"[EmbeddingService] HF API returned status code {response.status_code}: {response.text}")
         except Exception as e:
-            print(f"[EmbeddingService] HuggingFace API failed: {e}. Falling back to deterministic mock embedding.")
+            logger.info(f"[EmbeddingService] HuggingFace API failed: {e}. Falling back to deterministic mock embedding.")
 
         return self._generate_deterministic_mock(text)
 

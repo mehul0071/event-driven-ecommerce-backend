@@ -1,3 +1,5 @@
+import hashlib
+import json
 from uuid import UUID
 from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy import select
@@ -8,6 +10,8 @@ from app.core.database import AsyncSessionLocal
 from app.services.embedding_service import embedding_service
 from app.core.event_bus import event_bus
 from langfuse import observe
+import logging
+logger = logging.getLogger(__name__)
 
 
 async def update_product_embedding_bg(product_id: UUID, text_to_embed: str):
@@ -19,7 +23,7 @@ async def update_product_embedding_bg(product_id: UUID, text_to_embed: str):
         if product:
             product.embedding = embedding
             await db.commit()
-            print(f"[AI Ingestion] Generated and saved embedding for product {product.id}")
+            logger.info(f"[AI Ingestion] Generated and saved embedding for product {product.id}")
 
 
 async def create_product(
@@ -143,6 +147,25 @@ async def semantic_search_products(
     query_text: str,
     limit: int = 5
 ) -> list[ProductModel]:
+    cache_key = f"search:{hashlib.md5(query_text.encode()).hexdigest()}"
+    
+    if event_bus._connected and event_bus.redis:
+        try:
+            cached_data = await event_bus.redis.get(cache_key)
+            if cached_data:
+                product_ids = json.loads(cached_data)
+                if not product_ids:
+                    return []
+                stmt = select(ProductModel).where(ProductModel.id.in_(product_ids))
+                result = await db.execute(stmt)
+                products = result.scalars().all()
+                
+                product_map = {str(p.id): p for p in products}
+                ordered_products = [product_map[pid] for pid in product_ids if pid in product_map]
+                return ordered_products
+        except Exception as e:
+            logger.info(f"[ProductService] Redis cache get failed: {e}")
+
     query_vector = await embedding_service.generate_embedding(query_text)
     stmt = (
         select(ProductModel)
@@ -151,4 +174,13 @@ async def semantic_search_products(
         .limit(limit)
     )
     result = await db.execute(stmt)
-    return result.scalars().all()
+    products = result.scalars().all()
+    
+    if event_bus._connected and event_bus.redis:
+        try:
+            product_ids = [str(p.id) for p in products]
+            await event_bus.redis.setex(cache_key, 120, json.dumps(product_ids))
+        except Exception as e:
+            logger.info(f"[ProductService] Redis cache set failed: {e}")
+
+    return products
