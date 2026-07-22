@@ -1,10 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from uuid import UUID
+from datetime import datetime, timezone
+import math
+import logging
 from app.models.product import ProductModel
 from app.models.interaction import UserInteractionModel
 from app.schemas.interaction import UserInteractionCreate
 
+logger = logging.getLogger(__name__)
 
 async def log_user_interaction(
     db: AsyncSession,
@@ -22,17 +26,13 @@ async def log_user_interaction(
     return db_interaction
 
 
-# TODO (Taste Vector Improvements):
-# Current approach: simple average of last N embeddings
-# Known limitation: recency-blind, all interaction types equally weighted
-# Next step: weighted average with exponential decay + interaction-type weights (view < cart < purchase < positive_review)
 async def compute_user_taste_vector(
     db: AsyncSession,
     user_id: UUID,
     limit: int = 10
 ) -> list[float] | None:
     stmt = (
-        select(ProductModel.embedding)
+        select(ProductModel.embedding, UserInteractionModel.interaction_type, UserInteractionModel.created_at)
         .join(UserInteractionModel, UserInteractionModel.product_id == ProductModel.id)
         .where(UserInteractionModel.user_id == user_id)
         .where(ProductModel.embedding.isnot(None))
@@ -40,23 +40,45 @@ async def compute_user_taste_vector(
         .limit(limit)
     )
     result = await db.execute(stmt)
-    embeddings = result.scalars().all()
+    records = result.all()
 
-    if not embeddings:
+    if not records:
         return None
 
-    num_embeddings = len(embeddings)
-    vector_dim = len(embeddings[0])
+    vector_dim = len(records[0].embedding)
+    weighted_sum = [0.0] * vector_dim
+    total_weight = 0.0
+
+    interaction_weights = {
+        "view": 1.0,
+        "cart": 3.0,
+        "purchase": 5.0,
+        "positive_review": 7.0
+    }
     
-    average_vector = [0.0] * vector_dim
-    for emb in embeddings:
+    decay_lambda = 0.05
+    now = datetime.now(timezone.utc)
+
+    for record in records:
+        emb, i_type, created_at = record.embedding, record.interaction_type, record.created_at
+        
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+            
+        age_days = max(0.0, (now - created_at).total_seconds() / 86400.0)
+        time_decay = math.exp(-decay_lambda * age_days)
+        
+        base_weight = interaction_weights.get(i_type, 1.0)
+        weight = base_weight * time_decay
+        
         for i in range(vector_dim):
-            average_vector[i] += emb[i]
+            weighted_sum[i] += emb[i] * weight
+        total_weight += weight
 
-    for i in range(vector_dim):
-        average_vector[i] /= num_embeddings
+    if total_weight == 0.0:
+        return None
 
-    return average_vector
+    return [val / total_weight for val in weighted_sum]
 
 
 async def get_hybrid_recommendations(
