@@ -189,13 +189,16 @@ class LLMService:
     def _load_local_peft_model(self) -> bool:
         if self._model_loaded:
             return True
-        if not os.path.exists(self.adapter_path):
-            logger.info(f"[LLMService] Local adapter path {self.adapter_path} not found. Fallback to API/mock parser.")
+        
+        hf_adapter_repo = os.getenv("HF_ADAPTER_REPO")
+        adapter_to_load = hf_adapter_repo if hf_adapter_repo else self.adapter_path
+        
+        if not hf_adapter_repo and not os.path.exists(self.adapter_path):
+            logger.info(f"[LLMService] Local adapter path {self.adapter_path} not found and HF_ADAPTER_REPO not set. Fallback to API/mock parser.")
             return False
         
         try:
-            
-            logger.info(f"[LLMService] Loading local fine-tuned parser from {self.adapter_path}...")
+            logger.info(f"[LLMService] Loading fine-tuned parser from {adapter_to_load}...")
             device_map = "auto" if torch.cuda.is_available() else "cpu"
             torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
             
@@ -205,13 +208,13 @@ class LLMService:
                 torch_dtype=torch_dtype,
                 device_map=device_map
             )
-            self._model = PeftModel.from_pretrained(base_model, self.adapter_path)
+            self._model = PeftModel.from_pretrained(base_model, adapter_to_load)
             self._model.eval()
             self._model_loaded = True
-            logger.info("[LLMService] Local fine-tuned parser model loaded successfully.")
+            logger.info("[LLMService] Fine-tuned parser model loaded successfully.")
             return True
         except Exception as e:
-            logger.info(f"[LLMService] Failed to load local PEFT model: {e}")
+            logger.info(f"[LLMService] Failed to load PEFT model: {e}")
             return False
 
     async def parse_product_description(self, description: str) -> dict:
